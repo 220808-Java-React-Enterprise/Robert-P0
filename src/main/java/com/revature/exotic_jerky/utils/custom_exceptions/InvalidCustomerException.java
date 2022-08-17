@@ -1,4 +1,4 @@
-package com.revature.exotic_jerky.utils;
+package com.revature.exotic_jerky.utils.custom_exceptions;
 
 public class InvalidCustomerException extends RuntimeException{
 

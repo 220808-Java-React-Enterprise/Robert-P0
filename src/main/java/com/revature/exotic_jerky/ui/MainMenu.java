@@ -1,5 +1,8 @@
 package com.revature.exotic_jerky.ui;
 
+import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.services.CustomerService;
+
 import java.util.Scanner;
 
 public class MainMenu implements IMenu{
@@ -27,7 +30,7 @@ public class MainMenu implements IMenu{
                     new LoginMenu().start();
                 }
                 else if (input.equals("S")){
-                    new SignUpMenu().start();
+                    new SignUpMenu(new CustomerService(new CustomerDAO())).start();
                 }
                 else if (input.equals("X")){
                     System.out.println("Thanks for Visiting!"); break exit;

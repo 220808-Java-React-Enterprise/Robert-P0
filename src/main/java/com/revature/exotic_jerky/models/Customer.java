@@ -1,7 +1,7 @@
 package com.revature.exotic_jerky.models;
 
 public class Customer {
-    private String id, fName, lName, email, password, address, city, state, zip, phone;
+    private String id, fName, lName, email, password, address, city, state, zip, phone, role;
     public Customer(){
 
     }
@@ -16,6 +16,7 @@ public class Customer {
         this.state = state;
         this.zip = zip;
         this.phone = phone;
+        this.role = "DEFAULT";
     }
 
     @Override
@@ -24,18 +25,14 @@ public class Customer {
                 "fName='" + fName + '\'' +
                 ", lName='" + lName + '\'' +
                 ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
                 ", address='" + address + '\'' +
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", zip='" + zip + '\'' +
                 ", phone='" + phone + '\'' +
+                ", role='" + role + '\'' +
                 '}';
-    }
-
-    public String toFileString() {
-        return id + ":" + fName + ":" + lName + ":"
-                + email + ":" + password + ":" + address + ":"
-                + city + ":" + state + ":" + zip + ":" + phone + "\n";
     }
 
     public String getId(){
@@ -68,6 +65,14 @@ public class Customer {
 
     public void setEmail(String email){
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getAddress() {
@@ -108,5 +113,13 @@ public class Customer {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

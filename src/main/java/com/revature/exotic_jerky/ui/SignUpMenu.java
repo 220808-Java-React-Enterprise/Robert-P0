@@ -2,37 +2,41 @@ package com.revature.exotic_jerky.ui;
 
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.services.CustomerService;
-import com.revature.exotic_jerky.utils.InvalidCustomerException;
+import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 
 import java.util.Scanner;
 import java.util.UUID;
 
 public class SignUpMenu implements IMenu{
     private final CustomerService customer;
+
+    // Pre:
+    // Post:
+    // Purpose:
     Scanner input = new Scanner(System.in);
-    public SignUpMenu(){
-        this.customer = new CustomerService();
+
+    // Pre:
+    // Post:
+    // Purpose:
+    public SignUpMenu(CustomerService customer) {
+        this.customer = customer;
     }
+
+    // Pre: A new instance of SignUpMenu is called
+    // Post: A customer has signed up or canceled sign up
+    // Purpose: To sign up a customer to the database
     @Override
     public void start() {
         System.out.println("Sign Up!");
-        String fName, lName, email, address, city, state, zip, phone;
-        String pass;
 
-        fName = fName(); lName = lName();
-        email = email(); pass = pass();
-        address = address(); city = city();
-        state = state(); zip = zip();
-        phone = phone();
+        Customer cust = new Customer(UUID.randomUUID().toString(),
+                fName(), lName(), email(), pass(), address(), city(), state(), zip(), phone());
 
         confirm:{
             while (true){
-                System.out.println("\nSummary:");
-                System.out.println("Name: " + fName + " " + lName);
-                System.out.println("Email: " + email);
-                System.out.println("Address: " + address + ", " + city + ", " + state + " " + zip);
-                System.out.println("Phone: " + phone);
-                System.out.println("\nPlease confirm account Sign up " + fName + "!");
+                printSummaryOfCustomer(cust);
+
+                System.out.println("\nPlease confirm account Sign up " + cust.getfName() + "!");
                 System.out.println("[Y]es");
                 System.out.println("[N]o");
                 System.out.println("[U]pdate");
@@ -40,60 +44,13 @@ public class SignUpMenu implements IMenu{
 
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
-                        Customer cust = new Customer(UUID.randomUUID().toString(),
-                                fName, lName, email, pass, address, city, state, zip, phone);
                         customer.signUp(cust);
+                        break confirm;
                     case "N":
+                        new MainMenu().start();
                         break confirm;
                     case "U":
-                        updateExit:{
-                            while (true){
-                                System.out.println("\nWhat would you like to update!");
-                                System.out.println("[F]irst Name");
-                                System.out.println("[L]ast Name");
-                                System.out.println("[E]mail");
-                                System.out.println("[P]assword");
-                                System.out.println("[A]ddress");
-                                System.out.println("[C]ity");
-                                System.out.println("[S]tate");
-                                System.out.println("[Z]ip");
-                                System.out.println("P[h]one");
-                                System.out.println("[B]ack");
-                                System.out.print("\nEnter: ");
-
-                                switch (input.nextLine().toUpperCase()){
-                                    case "F": fName = fName();
-                                        System.out.println("\nFirst name updated"); break;
-                                    case "L": lName = lName();
-                                        System.out.println("\nLast name updated"); break;
-                                    case "E": email = email();
-                                        System.out.println("\nE-mail updated"); break;
-                                    case "P": pass = pass();
-                                        System.out.println("\nPassword updated"); break;
-                                    case "A": address = address();
-                                        System.out.println("\nAddress updated"); break;
-                                    case "C": city = city();
-                                        System.out.println("\nCity updated"); break;
-                                    case "S": state = state();
-                                        System.out.println("\nState updated"); break;
-                                    case "Z": zip = zip();
-                                        System.out.println("\nZip code updated"); break;
-                                    case "H": phone = phone();
-                                        System.out.println("\nPhone number updated"); break;
-                                    case "B": break updateExit;
-                                    default: System.out.println("\nInvalid entry! Try Again...");
-                                }
-
-                                System.out.println("\nUpdate More? [Y]es/[N]o");
-                                System.out.print("Enter: ");
-
-                                switch(input.nextLine().toUpperCase()){
-                                    case "Y": break;
-                                    case "N": break updateExit;
-                                    default: System.out.println("\nInvalid entry! Try Again...");
-                                }
-                            }
-                        }
+                        cust = updateInfo(cust);
                     default:
                         System.out.println("\nInvalid entry! Try Again...");
                         break;
@@ -102,6 +59,86 @@ public class SignUpMenu implements IMenu{
         }
     }
 
+    // Pre: A instance of Customer must be instantiated
+    // Post: A summary of the Customers credentials is printed
+    // Purpose: To print the Customers information
+    private static void printSummaryOfCustomer(Customer cust){
+        System.out.println("\nSummary:");
+        System.out.println("Name: " + cust.getfName() + " " + cust.getlName());
+        System.out.println("Email: " + cust.getEmail());
+        System.out.println("Address: " + cust.getAddress() + ", " + cust.getCity()
+                + ", " + cust.getState() + " " + cust.getZip());
+        System.out.println("Phone: " + cust.getPhone());
+    }
+
+    // Pre: A Customer has been instantiated, and they request to update
+    // Post: A Customer is returned with updated credentials
+    // Purpose: To update a Customers credentials
+    private Customer updateInfo(Customer cust){
+        Customer updated = cust;
+        exit:{
+            while (true){
+                updateExit:{
+                    System.out.println("\nWhat would you like to update!");
+                    System.out.println("[F]irst Name");
+                    System.out.println("[L]ast Name");
+                    System.out.println("[E]mail");
+                    System.out.println("[P]assword");
+                    System.out.println("[A]ddress");
+                    System.out.println("[C]ity");
+                    System.out.println("[S]tate");
+                    System.out.println("[Z]ip");
+                    System.out.println("P[h]one");
+                    System.out.println("[B]ack/Cancel");
+
+                    while (true){
+                        System.out.print("\nEnter: ");
+                        switch (input.nextLine().toUpperCase()){
+                            case "F": updated.setfName(fName());
+                                System.out.println("\nFirst name updated"); break updateExit;
+                            case "L": updated.setlName(lName());
+                                System.out.println("\nLast name updated"); break updateExit;
+                            case "E": updated.setEmail(email());
+                                System.out.println("\nE-mail updated"); break updateExit;
+                            case "P": updated.setPassword(pass());
+                                System.out.println("\nPassword updated"); break updateExit;
+                            case "A": updated.setAddress(address());
+                                System.out.println("\nAddress updated"); break updateExit;
+                            case "C": updated.setCity(city());
+                                System.out.println("\nCity updated"); break updateExit;
+                            case "S": updated.setState(state());
+                                System.out.println("\nState updated"); break updateExit;
+                            case "Z": updated.setZip(zip());
+                                System.out.println("\nZip code updated"); break updateExit;
+                            case "H": updated.setPhone(phone());
+                                System.out.println("\nPhone number updated"); break updateExit;
+                            case "B": return cust;
+                            default: System.out.println("\nInvalid entry! Try Again...");
+                        }
+                    }
+                }
+                verifyExit:{
+                    while (true){
+                        printSummaryOfCustomer(updated);
+                        System.out.println("\nUpdate More? [Y]es/[N]o/[C]ancel");
+                        System.out.print("Enter: ");
+
+                        switch(input.nextLine().toUpperCase()){
+                            case "Y": break verifyExit;
+                            case "N": break exit;
+                            case "C": return cust;
+                            default: System.out.println("\nInvalid entry! Try Again...");
+                        }
+                    }
+                }
+            }
+        }
+        return updated;
+    }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their first name
     private String fName(){
         String fName;
         fNameExit:{
@@ -120,6 +157,10 @@ public class SignUpMenu implements IMenu{
         }
         return fName;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their last name
     private String lName(){
         String lName;
         lNameExit:{
@@ -138,6 +179,10 @@ public class SignUpMenu implements IMenu{
         }
         return lName;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their email
     private String email(){
         String email;
         emailExit:{
@@ -155,6 +200,10 @@ public class SignUpMenu implements IMenu{
         }
         return email;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their password
     private String pass(){
         String pass;
         passExit:{
@@ -184,6 +233,10 @@ public class SignUpMenu implements IMenu{
         }
         return pass;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their address
     private String address(){
         String address;
         addressExit:{
@@ -203,6 +256,10 @@ public class SignUpMenu implements IMenu{
         }
         return address;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their city
     private String city(){
         String city;
         cityExit:{
@@ -221,6 +278,10 @@ public class SignUpMenu implements IMenu{
         }
         return city;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their state
     private String state(){
         String state;
         stateExit:{
@@ -239,6 +300,10 @@ public class SignUpMenu implements IMenu{
         }
         return state;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their zip code
     private String zip(){
         String zip;
         zipExit:{
@@ -257,6 +322,10 @@ public class SignUpMenu implements IMenu{
         }
         return zip;
     }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their phone number
     private String phone(){
         String phone;
         phoneExit:{
