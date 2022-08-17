@@ -1,4 +1,4 @@
-package ui;
+package com.revature.exotic_jerky.ui;
 
 import java.util.Scanner;
 

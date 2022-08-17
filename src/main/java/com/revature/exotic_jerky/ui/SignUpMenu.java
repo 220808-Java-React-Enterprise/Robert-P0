@@ -1,10 +1,9 @@
-package ui;
+package com.revature.exotic_jerky.ui;
 
-import models.Customer;
-import services.CustomerService;
-import utils.Exceptions.InvalidCustomerException;
+import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.services.CustomerService;
+import com.revature.exotic_jerky.utils.InvalidCustomerException;
 
-import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.UUID;
 

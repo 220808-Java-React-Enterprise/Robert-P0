@@ -1,6 +1,6 @@
-package ui;
+package com.revature.exotic_jerky;
 
-import java.util.Arrays;
+import com.revature.exotic_jerky.ui.MainMenu;
 
 public class Main {
     public static void main(String[] args) {

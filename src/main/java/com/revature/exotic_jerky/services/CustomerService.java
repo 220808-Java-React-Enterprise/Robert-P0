@@ -1,8 +1,8 @@
-package services;
+package com.revature.exotic_jerky.services;
 
-import daos.CustomerDAO;
-import models.Customer;
-import utils.Exceptions.InvalidCustomerException;
+import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.utils.InvalidCustomerException;
 
 public class CustomerService {
     private final CustomerDAO custDAO;

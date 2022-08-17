@@ -1,4 +1,4 @@
-package daos;
+package com.revature.exotic_jerky.daos;
 
 import java.io.IOException;
 import java.util.List;

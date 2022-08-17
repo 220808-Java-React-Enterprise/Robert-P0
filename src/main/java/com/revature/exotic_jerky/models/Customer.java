@@ -1,4 +1,4 @@
-package models;
+package com.revature.exotic_jerky.models;
 
 public class Customer {
     private String id, fName, lName, email, password, address, city, state, zip, phone;

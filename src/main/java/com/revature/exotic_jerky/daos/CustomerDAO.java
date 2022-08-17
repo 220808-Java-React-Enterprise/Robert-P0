@@ -1,6 +1,6 @@
-package daos;
+package com.revature.exotic_jerky.daos;
 
-import models.Customer;
+import com.revature.exotic_jerky.models.Customer;
 
 import java.io.*;
 import java.util.ArrayList;
