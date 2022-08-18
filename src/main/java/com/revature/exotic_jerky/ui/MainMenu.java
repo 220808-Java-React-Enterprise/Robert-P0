@@ -24,10 +24,9 @@ public class MainMenu implements IMenu{
                 input = scan.nextLine().toUpperCase();
 
                 if (input.equals("P")){
-
                 }
                 else if (input.equals("L")){
-                    new LoginMenu().start();
+                    new LoginMenu(new CustomerService(new CustomerDAO())).start();
                 }
                 else if (input.equals("S")){
                     new SignUpMenu(new CustomerService(new CustomerDAO())).start();

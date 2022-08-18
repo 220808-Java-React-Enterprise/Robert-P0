@@ -1,5 +1,6 @@
 package com.revature.exotic_jerky.ui;
 
+import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class SignUpMenu implements IMenu{
-    private final CustomerService customer;
+    private final CustomerService customerService;
 
     // Pre:
     // Post:
@@ -19,7 +20,7 @@ public class SignUpMenu implements IMenu{
     // Post:
     // Purpose:
     public SignUpMenu(CustomerService customer) {
-        this.customer = customer;
+        this.customerService = customer;
     }
 
     // Pre: A new instance of SignUpMenu is called
@@ -29,14 +30,14 @@ public class SignUpMenu implements IMenu{
     public void start() {
         System.out.println("Sign Up!");
 
-        Customer cust = new Customer(UUID.randomUUID().toString(),
+        Customer customer = new Customer(UUID.randomUUID().toString(),
                 fName(), lName(), email(), pass(), address(), city(), state(), zip(), phone());
 
-        confirm:{
+        Exit:{
             while (true){
-                printSummaryOfCustomer(cust);
+                printSummaryOfCustomer(customer);
 
-                System.out.println("\nPlease confirm account Sign up " + cust.getfName() + "!");
+                System.out.println("\nPlease confirm account Sign up " + customer.getfName() + "!");
                 System.out.println("[Y]es");
                 System.out.println("[N]o");
                 System.out.println("[U]pdate");
@@ -44,13 +45,14 @@ public class SignUpMenu implements IMenu{
 
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
-                        customer.signUp(cust);
-                        break confirm;
+                        customerService.signUp(customer);
+                        new ProductMenu(customer, new CustomerService(new CustomerDAO())).start();
+                        break Exit;
                     case "N":
                         new MainMenu().start();
-                        break confirm;
+                        break Exit;
                     case "U":
-                        cust = updateInfo(cust);
+                        customer = updateInfo(customer);
                     default:
                         System.out.println("\nInvalid entry! Try Again...");
                         break;
@@ -148,7 +150,7 @@ public class SignUpMenu implements IMenu{
                 fName = fName.substring(0,1).toUpperCase() + fName.substring(1).toLowerCase();
 
                 try{
-                    customer.isValidName(fName);
+                    customerService.isValidName(fName);
                     break fNameExit;
                 }catch(InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -170,7 +172,7 @@ public class SignUpMenu implements IMenu{
                 lName = lName.substring(0,1).toUpperCase() + lName.substring(1).toLowerCase();
 
                 try{
-                    customer.isValidName(lName);
+                    customerService.isValidName(lName);
                     break lNameExit;
                 }catch(InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -191,7 +193,8 @@ public class SignUpMenu implements IMenu{
                 email = input.nextLine();
 
                 try{
-                    customer.isValidEmail(email);
+                    customerService.isDuplicateEmail(email);
+                    customerService.isValidEmail(email);
                     break emailExit;
                 }catch(InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -212,7 +215,7 @@ public class SignUpMenu implements IMenu{
                 pass = input.nextLine();
 
                 try{
-                    customer.isValidPassword(pass);
+                    customerService.isValidPassword(pass);
                     String tempPass = pass;
                     passConfirm:{
                         while (true){
@@ -246,7 +249,7 @@ public class SignUpMenu implements IMenu{
                 address = input.nextLine();
 
                 try{
-                    customer.isValidAddress(address);
+                    customerService.isValidAddress(address);
                     address = address.toUpperCase();
                     break addressExit;
                 }catch (InvalidCustomerException e){
@@ -269,7 +272,7 @@ public class SignUpMenu implements IMenu{
                 city = city.substring(0,1).toUpperCase() + city.substring(1);
 
                 try{
-                    customer.isValidName(city);
+                    customerService.isValidName(city);
                     break cityExit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -291,7 +294,7 @@ public class SignUpMenu implements IMenu{
                 state = input.nextLine().toUpperCase();
 
                 try{
-                    customer.isValidState(state);
+                    customerService.isValidState(state);
                     break stateExit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -313,7 +316,7 @@ public class SignUpMenu implements IMenu{
                 zip = input.nextLine();
 
                 try{
-                    customer.isValidZip(zip);
+                    customerService.isValidZip(zip);
                     break zipExit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());
@@ -335,7 +338,7 @@ public class SignUpMenu implements IMenu{
                 phone = input.nextLine();
 
                 try{
-                    customer.isValidPhone(phone);
+                    customerService.isValidPhone(phone);
                     break phoneExit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());

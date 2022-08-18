@@ -19,6 +19,20 @@ public class Customer {
         this.role = "DEFAULT";
     }
 
+    public Customer(String id, String fName, String lName, String email, String password, String address, String city, String state, String zip, String phone, String role) {
+        this.id = id;
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.phone = phone;
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +

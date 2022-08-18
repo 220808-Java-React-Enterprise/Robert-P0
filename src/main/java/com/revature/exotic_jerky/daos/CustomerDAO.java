@@ -1,10 +1,12 @@
 package com.revature.exotic_jerky.daos;
 
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class CustomerDAO implements CrudDAO<Customer>{
             ps.setString(11, cust.getRole());
             ps.executeUpdate();
         } catch (SQLException e){
-            throw new RuntimeException("Error trying to save to database");
+            throw new InvalidSQLException("Error trying to save to database");
         }
     }
 
@@ -44,6 +46,35 @@ public class CustomerDAO implements CrudDAO<Customer>{
 
     @Override
     public List getAll() {
+        return null;
+    }
+
+    public String getByEmail(String email){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT (email) FROM customers WHERE email = ?");
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return rs.getString("email");
+
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error getting user");
+        }
+        return null;
+    }
+
+    public Customer getByEmailAndPassword(String email, String password){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM customers WHERE email = ? AND password = ?");
+            ps.setString(1, email); ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return new Customer(rs.getString("id"), rs.getString("fname"), rs.getString("lname"), rs.getString("email"),
+                    rs.getString("password"), rs.getString("address"), rs.getString("city"), rs.getString("state"), rs.getString("zip"),
+                    rs.getString("phone"),rs.getString("role"));
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error finding user");
+        }
         return null;
     }
 }
