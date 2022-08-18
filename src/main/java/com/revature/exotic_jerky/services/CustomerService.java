@@ -6,24 +6,24 @@ import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerExceptio
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 
 public class CustomerService {
-    private final CustomerDAO custDAO;
+    private final CustomerDAO customerDAO;
 
     // Pre:
     // Post:
     // Purpose:
-    public CustomerService(CustomerDAO custDAO){
-        this.custDAO = custDAO;
+    public CustomerService(CustomerDAO customerDAO){
+        this.customerDAO = customerDAO;
     }
 
     // Pre:
     // Post:
     // Purpose:
-    public void signUp(Customer cust){
-        custDAO.save(cust);
+    public void signUp(Customer customer){
+        customerDAO.save(customer);
     }
 
     public Customer login(String email, String password){
-        Customer customer = custDAO.getByEmailAndPassword(email, password);
+        Customer customer = customerDAO.getByEmailAndPassword(email, password);
         if (customer == null)
             throw new InvalidCustomerException("Email or Password is Wrong!");
         return customer;
@@ -32,8 +32,15 @@ public class CustomerService {
     // Pre:
     // Post:
     // Purpose:
+    public void updateAccount(Customer customer){
+        customerDAO.update(customer);
+    }
+    
+    // Pre:
+    // Post:
+    // Purpose:
     public boolean isDuplicateEmail(String email){
-        if (custDAO.getByEmail(email) != null) return true;
+        if (customerDAO.getByEmail(email) != null) return true;
         else return false;
     }
 

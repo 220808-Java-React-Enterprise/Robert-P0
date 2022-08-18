@@ -1,11 +1,9 @@
 package com.revature.exotic_jerky.ui;
 
-import com.revature.exotic_jerky.daos.CartDAO;
 import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
-import com.revature.exotic_jerky.services.CartService;
+import com.revature.exotic_jerky.models.UpdateAccount;
 import com.revature.exotic_jerky.services.CustomerService;
-import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 
 import java.util.Scanner;
 import java.util.UUID;
@@ -45,10 +43,10 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
                         customerService.signUp(customer);
-                        new ProductMenu(customer, new CustomerService(new CustomerDAO()), new CartService(new CartDAO()), true).start();
+                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
                         break Exit;
                     case "N":
-                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
+                        new MainMenu(new CustomerService(new CustomerDAO())).start();
                         break Exit;
                     case "U":
                         customer = updateInfo(customer);

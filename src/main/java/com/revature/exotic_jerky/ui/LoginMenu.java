@@ -44,7 +44,7 @@ public class LoginMenu implements IMenu{
                 try{
                     Customer customer = customerService.login(email, password);
                     if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new CustomerService(new CustomerDAO())).start();
-                    else new ProductMenu(customer, new CustomerService(new CustomerDAO()), new CartService(new CartDAO()), true).start();
+                    else new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
                     break exit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());

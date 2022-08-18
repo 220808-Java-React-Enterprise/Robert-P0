@@ -1,4 +1,4 @@
-package com.revature.exotic_jerky.ui;
+package com.revature.exotic_jerky.models;
 
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.services.CustomerService;
@@ -6,7 +6,7 @@ import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerExceptio
 
 import java.util.Scanner;
 
-public abstract class UpdateAccount {
+public class UpdateAccount {
     private final CustomerService customerService;
 
     Scanner input = new Scanner(System.in);
@@ -18,20 +18,20 @@ public abstract class UpdateAccount {
     // Pre: A instance of Customer must be instantiated
     // Post: A summary of the Customers credentials is printed
     // Purpose: To print the Customers information
-    static void printSummaryOfCustomer(Customer cust){
+    public static void printSummaryOfCustomer(Customer customer){
         System.out.println("\nSummary:");
-        System.out.println("Name: " + cust.getfName() + " " + cust.getlName());
-        System.out.println("Email: " + cust.getEmail());
-        System.out.println("Address: " + cust.getAddress() + ", " + cust.getCity()
-                + ", " + cust.getState() + " " + cust.getZip());
-        System.out.println("Phone: " + cust.getPhone());
+        System.out.println("Name: " + customer.getfName() + " " + customer.getlName());
+        System.out.println("Email: " + customer.getEmail());
+        System.out.println("Address: " + customer.getAddress() + ", " + customer.getCity()
+                + ", " + customer.getState() + " " + customer.getZip());
+        System.out.println("Phone: " + customer.getPhone());
     }
 
     // Pre: A Customer has been instantiated, and they request to update
     // Post: A Customer is returned with updated credentials
     // Purpose: To update a Customers credentials
-    Customer updateInfo(Customer cust){
-        Customer updated = cust;
+    protected Customer updateInfo(Customer customer){
+        Customer updated = customer;
         exit:{
             while (true){
                 updateExit:{
@@ -56,7 +56,7 @@ public abstract class UpdateAccount {
                                 System.out.println("\nLast name updated"); break updateExit;
                             case "E": updated.setEmail(email());
                                 System.out.println("\nE-mail updated"); break updateExit;
-                            case "P": updated.setPassword(pass());
+                            case "P": updated.setPassword(pass(customer.getPassword()));
                                 System.out.println("\nPassword updated"); break updateExit;
                             case "A": updated.setAddress(address());
                                 System.out.println("\nAddress updated"); break updateExit;
@@ -68,7 +68,7 @@ public abstract class UpdateAccount {
                                 System.out.println("\nZip code updated"); break updateExit;
                             case "H": updated.setPhone(phone());
                                 System.out.println("\nPhone number updated"); break updateExit;
-                            case "B": return cust;
+                            case "B": return customer;
                             default: System.out.println("\nInvalid entry! Try Again...");
                         }
                     }
@@ -81,8 +81,8 @@ public abstract class UpdateAccount {
 
                         switch(input.nextLine().toUpperCase()){
                             case "Y": break verifyExit;
-                            case "N": break exit;
-                            case "C": return cust;
+                            case "N": customerService.updateAccount(updated); break exit;
+                            case "C": return customer;
                             default: System.out.println("\nInvalid entry! Try Again...");
                         }
                     }
@@ -95,7 +95,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their first name
-    String fName(){
+    protected String fName(){
         String fName;
         fNameExit:{
             while (true){
@@ -117,7 +117,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their last name
-    String lName(){
+    protected String lName(){
         String lName;
         lNameExit:{
             while (true) {
@@ -139,7 +139,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their email
-    String email(){
+    protected String email(){
         String email;
         emailExit:{
             while (true){
@@ -162,7 +162,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their password
-    String pass(){
+    protected String pass(){
         String pass;
         passExit:{
             while (true){
@@ -192,10 +192,59 @@ public abstract class UpdateAccount {
         return pass;
     }
 
+    // Pre: None
+    // Post: Password is updated
+    // Purpose: To update the password
+    protected String pass(String pass){
+        String oldPass;
+        String newPass;
+        exit:{
+            while (true){
+                System.out.println("\nEnter old password. Or [B]ack ");
+                System.out.print("Enter: ");
+                oldPass = input.nextLine();
+                if (oldPass.equalsIgnoreCase("B"))
+                    return pass;
+                else if (!oldPass.equals(pass))
+                    System.out.println("\nIncorrect password.");
+                else
+                    break exit;
+            }
+        }
+
+        passExit:{
+            while (true){
+                System.out.print("\nEnter a new password: ");
+                newPass = input.nextLine();
+
+                try{
+                    customerService.isValidPassword(newPass);
+                    String tempPass = newPass;
+                    passConfirm:{
+                        while (true){
+                            System.out.print("\nConfirm password: ");
+                            newPass = input.nextLine();
+
+                            if (newPass.equalsIgnoreCase("B"))
+                                break passConfirm;
+                            else if (newPass.equals(tempPass))
+                                break passExit;
+                            System.out.println("\nPasswords Don't Match! Try again... Or [B]ack to re-enter password.");
+                        }
+                    }
+                } catch(InvalidCustomerException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+
+        return newPass;
+    }
+
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their address
-    String address(){
+    protected String address(){
         String address;
         addressExit:{
             while (true){
@@ -218,7 +267,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their city
-    String city(){
+    protected String city(){
         String city;
         cityExit:{
             while (true){
@@ -240,7 +289,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their state
-    String state(){
+    protected String state(){
         String state;
         stateExit:{
             while (true){
@@ -262,7 +311,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their zip code
-    String zip(){
+    protected String zip(){
         String zip;
         zipExit:{
             while (true){
@@ -284,7 +333,7 @@ public abstract class UpdateAccount {
     // Pre: Non
     // Post: A String value is returned
     // Purpose: To get users input for their phone number
-    String phone(){
+    protected String phone(){
         String phone;
         phoneExit:{
             while (true){

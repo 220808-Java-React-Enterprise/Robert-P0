@@ -13,16 +13,16 @@ import java.util.List;
 public class CustomerDAO implements CrudDAO<Customer>{
 
     @Override
-    public void save(Customer cust){
+    public void save(Customer customer){
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("INSERT INTO customers (id, fname, lname, email, password, " +
                     "address, city, state, zip, phone, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            ps.setString(1, cust.getId()); ps.setString(2, cust.getfName());
-            ps.setString(3, cust.getlName()); ps.setString(4, cust.getEmail());
-            ps.setString(5, cust.getPassword()); ps.setString(6, cust.getAddress());
-            ps.setString(7, cust.getCity()); ps.setString(8, cust.getState());
-            ps.setString(9, cust.getZip()); ps.setString(10, cust.getPhone());
-            ps.setString(11, cust.getRole());
+            ps.setString(1, customer.getId()); ps.setString(2, customer.getfName());
+            ps.setString(3, customer.getlName()); ps.setString(4, customer.getEmail());
+            ps.setString(5, customer.getPassword()); ps.setString(6, customer.getAddress());
+            ps.setString(7, customer.getCity()); ps.setString(8, customer.getState());
+            ps.setString(9, customer.getZip()); ps.setString(10, customer.getPhone());
+            ps.setString(11, customer.getRole());
             ps.executeUpdate();
         } catch (SQLException e){
             throw new InvalidSQLException("Error trying to save to database");
@@ -30,8 +30,20 @@ public class CustomerDAO implements CrudDAO<Customer>{
     }
 
     @Override
-    public void update(Customer obj) {
-
+    public void update(Customer customer) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("UPDATE customers SET fname = ?, lname = ?, email = ?," +
+                    "password = ?, address = ?, city = ?, state = ?, zip = ?, phone = ?, role = ? WHERE id = ?");
+            ps.setString(1, customer.getfName()); ps.setString(2, customer.getlName());
+            ps.setString(3, customer.getEmail()); ps.setString(4, customer.getPassword());
+            ps.setString(5, customer.getAddress()); ps.setString(6, customer.getCity());
+            ps.setString(7, customer.getState()); ps.setString(8, customer.getZip());
+            ps.setString(9, customer.getPhone()); ps.setString(10, customer.getRole());
+            ps.setString(11, customer.getId());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to update database");
+        }
     }
 
     @Override

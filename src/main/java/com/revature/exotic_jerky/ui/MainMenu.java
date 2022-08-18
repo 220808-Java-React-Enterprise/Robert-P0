@@ -2,9 +2,12 @@ package com.revature.exotic_jerky.ui;
 
 import com.revature.exotic_jerky.daos.CartDAO;
 import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.daos.ProductDAO;
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.models.UpdateAccount;
 import com.revature.exotic_jerky.services.CartService;
 import com.revature.exotic_jerky.services.CustomerService;
+import com.revature.exotic_jerky.services.ProductService;
 
 import java.util.Scanner;
 
@@ -34,9 +37,9 @@ public class MainMenu extends UpdateAccount implements IMenu{
                 System.out.print("\nEnter: ");
 
                 switch (scan.nextLine().toUpperCase()){
-                    case "P": new ProductMenu(new Customer(), new CustomerService(new CustomerDAO()), new CartService(new CartDAO()), false); break;
-                    case "L": new LoginMenu(new CustomerService(new CustomerDAO())).start(); break;
-                    case "S": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break;
+                    case "P": new ProductMenu(new Customer(), new ProductService(new ProductDAO()), new CartService(new CartDAO()), false); break exit;
+                    case "L": new LoginMenu(new CustomerService(new CustomerDAO())).start(); break exit;
+                    case "S": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                     case "X":
                         System.out.println("Thanks for Visiting! Hope to see you again!"); break exit;
                 }
@@ -48,25 +51,30 @@ public class MainMenu extends UpdateAccount implements IMenu{
     // Post: The start menu for a signed in customer is printed out
     // Purpose: To bring customer back to the MainMenu
     public void start(Customer customer, Boolean loggedIn) {
-        String input;
-        System.out.println("\nWelcome " + customer.getfName() + " to Exotic Jerky!");
-
-        exit:
-        {
+        exit:{
             while (true){
-                System.out.println("[P]roduct");
-                System.out.println("[S]ign Out");
-                System.out.println("[U]pdate Account");
-                System.out.println("E[x]it");
+                String input;
+                System.out.println("\nWelcome " + customer.getfName() + " to Exotic Jerky!");
 
-                System.out.print("\nEnter: ");
+                menuExit:
+                {
+                    while (true){
+                        System.out.println("[P]roduct");
+                        System.out.println("[S]ign Out");
+                        System.out.println("[U]pdate Account");
+                        System.out.println("E[x]it Store");
 
-                switch (scan.nextLine().toUpperCase()){
-                    case "P": new ProductMenu(customer, new CustomerService(new CustomerDAO()), new CartService(new CartDAO()), true); break;
-                    case "S": new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
-                    case "U": updateInfo(customer); break exit;
-                    case "X":
-                        System.out.println("Thanks for Visiting! Hope to see you again!"); break exit;
+                        System.out.print("\nEnter: ");
+
+                        switch (scan.nextLine().toUpperCase()){
+                            case "P": new ProductMenu(customer, new ProductService(new ProductDAO()), new CartService(new CartDAO()), true); break;
+                            case "S": new MainMenu(new CustomerService(new CustomerDAO())).start(); break menuExit;
+                            case "U": updateInfo(customer);
+                                System.out.println("\nAccount information updated!");break menuExit;
+                            case "X":
+                                System.out.println("Thanks for Visiting! Hope to see you again!"); break exit;
+                        }
+                    }
                 }
             }
         }

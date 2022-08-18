@@ -45,7 +45,6 @@ public class CartDAO implements CrudDAO<Cart>{
 
             if (rs.next()) return new Cart(rs.getString("id"), rs.getString("customer_id"), rs.getDate("created"), rs.getFloat("total"));
         } catch (SQLException e){
-            throw new InvalidSQLException("Error finding cart");
         }
         return null;
     }
