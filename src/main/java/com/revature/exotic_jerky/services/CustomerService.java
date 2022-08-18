@@ -33,8 +33,8 @@ public class CustomerService {
     // Post:
     // Purpose:
     public boolean isDuplicateEmail(String email){
-        if (custDAO.getByEmail(email) != null) throw new InvalidCustomerException(email + " already exists.");
-        return false;
+        if (custDAO.getByEmail(email) != null) return true;
+        else return false;
     }
 
     // Pre:

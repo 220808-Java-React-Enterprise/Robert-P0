@@ -1,10 +1,11 @@
 package com.revature.exotic_jerky.ui;
 
+import com.revature.exotic_jerky.daos.CartDAO;
 import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.services.CartService;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
-import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 
 import java.util.Scanner;
 
@@ -25,7 +26,7 @@ public class LoginMenu implements IMenu{
     // Purpose: To log in to a customers account
     @Override
     public void start() {
-        System.out.println("\nLets login! [M]ain Menu");
+        System.out.println("\nLets login! Or [M]ain Menu");
         String email, password;
 
         exit:{
@@ -34,38 +35,19 @@ public class LoginMenu implements IMenu{
                 email = input.nextLine();
 
                 if (email.equalsIgnoreCase("M")){
-                    new MainMenu().start(); break exit;
+                    new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                 }
 
-                signUpExit:{
-                    if (!customerService.isDuplicateEmail(email)) {
-                        System.out.println("\nEmail doesn't exist!");
-                        System.out.println("Would you like to sign up? [Y]es/[N]o/[M]ain Menu");
+                System.out.print("\nPassword: ");
+                password = input.nextLine();
 
-                        while (true){
-                            System.out.print("\nEnter: ");
-
-                            switch (input.nextLine().toUpperCase()){
-                                case "Y": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break exit;
-                                case "N": break signUpExit;
-                                case "M": new MainMenu().start(); break exit;
-                                default:
-                                    System.out.println("\nInvalid input. Try again...");
-                            }
-                        }
-                    }
-
-                    System.out.print("\nPassword: ");
-                    password = input.nextLine();
-
-                    try{
-                        Customer customer = customerService.login(email, password);
-                        if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new CustomerService(new CustomerDAO())).start();
-                        else new ProductMenu(customer, new CustomerService(new CustomerDAO())).start();
-                        break exit;
-                    } catch (InvalidCustomerException e){
-                        System.out.println(e.getMessage());
-                    }
+                try{
+                    Customer customer = customerService.login(email, password);
+                    if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new CustomerService(new CustomerDAO())).start();
+                    else new ProductMenu(customer, new CustomerService(new CustomerDAO()), new CartService(new CartDAO()), true).start();
+                    break exit;
+                } catch (InvalidCustomerException e){
+                    System.out.println(e.getMessage());
                 }
             }
         }
