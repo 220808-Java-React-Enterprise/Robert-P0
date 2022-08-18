@@ -1,20 +1,26 @@
 package com.revature.exotic_jerky.daos;
 
 import com.revature.exotic_jerky.models.Cart;
+import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
+import java.util.UUID;
 
 public class CartDAO implements CrudDAO<Cart>{
     @Override
-    public void save(Cart obj) throws IOException {
-
+    public void save(Cart cart){
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("INSERT INTO carts (id, total, created, customer_id) VALUES (?, ?, ?, ?)");
+            ps.setString(1, cart.getId()); ps.setFloat(2, cart.getTotal());
+            ps.setString(3, String.valueOf(cart.getDate())); ps.setString(4, cart.getCustomerID());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error trying to save cart to database");
+        }
     }
 
     @Override
@@ -47,5 +53,16 @@ public class CartDAO implements CrudDAO<Cart>{
         } catch (SQLException e){
         }
         return null;
+    }
+
+    public void addToCart(Cart cart, byte quantity, Product product){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("INSERT INTO carts_jct (id, quantity, cart_id, product_id) VALUES (?, ?, ?, ?)");
+            ps.setString(1, UUID.randomUUID().toString()); ps.setByte(2, quantity);
+            ps.setString(3, cart.getId()); ps.setString(4, product.getId());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error trying to save to cart");
+        }
     }
 }

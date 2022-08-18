@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ProductDAO implements CrudDAO<Product>{
     @Override
@@ -38,16 +40,16 @@ public class ProductDAO implements CrudDAO<Product>{
         return null;
     }
 
-    public List<Product> getAllByCategory(String category){
-        List<Product> products = new ArrayList<>();
+    public Map<String, Product> getAllByCategory(String category){
+        Map<String, Product> products = new TreeMap<>();
 
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("SELECT * FROM products WHERE category = ?");
             ps.setString(1, category);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
-                products.add(new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
-                        rs.getString("description"), rs.getString("store_id"), rs.getFloat("price")));
+                products.put(rs.getString("name"), new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
+                        rs.getString("description"), rs.getString("store_id"), rs.getByte("quantity"), rs.getFloat("price")));
             }
         } catch (SQLException e){
             throw new InvalidSQLException("Error getting product by category");

@@ -41,6 +41,10 @@ public class LoginMenu implements IMenu{
                 System.out.print("\nPassword: ");
                 password = input.nextLine();
 
+                if (email.equalsIgnoreCase("M")){
+                    new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
+                }
+
                 try{
                     Customer customer = customerService.login(email, password);
                     if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new CustomerService(new CustomerDAO())).start();

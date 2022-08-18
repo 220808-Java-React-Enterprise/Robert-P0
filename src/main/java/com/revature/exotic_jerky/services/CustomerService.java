@@ -49,7 +49,7 @@ public class CustomerService {
     // Purpose:
     public boolean isValidName(String name){
         if (!name.matches("^[\\p{L} .'-]+$")) throw new InvalidCustomerException("\nInvalid format!");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -58,7 +58,7 @@ public class CustomerService {
     public boolean isValidEmail(String email){
         if (!email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"))
             throw new InvalidCustomerException("\nInvalid email format!");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -67,7 +67,7 @@ public class CustomerService {
     public boolean isValidAddress(String address){
         if (!address.matches("^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)?$"))
             throw new InvalidCustomerException("Invalid address! Try again...");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -76,7 +76,7 @@ public class CustomerService {
     public boolean isValidState(String state){
         if (!state.matches("^(?-i:A[LKSZRAEP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$"))
             throw new InvalidCustomerException("\nInvalid state abbreviation");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -85,7 +85,7 @@ public class CustomerService {
     public boolean isValidZip(String zip){
         if (!zip.matches("^[0-9]{5}(?:-[0-9]{4})?$"))
             throw new InvalidCustomerException("\nInvalid zip code format");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -94,7 +94,7 @@ public class CustomerService {
     public boolean isValidPhone(String phone){
         if (!phone.matches("^(\\d{3}[- .]?){2}\\d{4}$"))
             throw new InvalidCustomerException("\nInvalid phone number format");
-        return false;
+        return true;
     }
 
     // Pre:
@@ -103,6 +103,6 @@ public class CustomerService {
     public boolean isValidPassword(String pass){
         if (!pass.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"))
             throw new InvalidCustomerException("\nInvalid password! Minimum eight characters, at least one letter and one number");
-        return false;
+        return true;
     }
 }

@@ -5,6 +5,7 @@ import com.revature.exotic_jerky.models.Cart;
 import com.revature.exotic_jerky.models.Product;
 
 import java.util.List;
+import java.util.Map;
 
 public class ProductService {
     private final ProductDAO productDAO;
@@ -16,7 +17,7 @@ public class ProductService {
         this.productDAO = productDAO;
     }
 
-    public List<Product> getProduct(String category){
+    public Map<String, Product> getProduct(String category){
         return productDAO.getAllByCategory(category);
     }
 }

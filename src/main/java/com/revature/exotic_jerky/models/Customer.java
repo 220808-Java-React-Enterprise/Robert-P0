@@ -1,9 +1,13 @@
 package com.revature.exotic_jerky.models;
 
+import java.util.UUID;
+
 public class Customer {
     private String id, fName, lName, email, password, address, city, state, zip, phone, role;
 
-    public Customer(){}
+    public Customer(){
+        this.id = UUID.randomUUID().toString();
+    }
     public Customer(String id, String fName, String lName, String email, String password, String address, String city, String state, String zip, String phone) {
         this.id = id;
         this.fName = fName;

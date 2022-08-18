@@ -37,7 +37,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                 System.out.print("\nEnter: ");
 
                 switch (scan.nextLine().toUpperCase()){
-                    case "P": new ProductMenu(new Customer(), new ProductService(new ProductDAO()), new CartService(new CartDAO()), false); break exit;
+                    case "P": new ProductMenu(new Customer(), new CustomerService(new CustomerDAO()), new ProductService(new ProductDAO()), new CartService(new CartDAO()), false).start(); break exit;
                     case "L": new LoginMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                     case "S": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                     case "X":
@@ -67,7 +67,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                         System.out.print("\nEnter: ");
 
                         switch (scan.nextLine().toUpperCase()){
-                            case "P": new ProductMenu(customer, new ProductService(new ProductDAO()), new CartService(new CartDAO()), true); break;
+                            case "P": new ProductMenu(customer, new CustomerService(new CustomerDAO()), new ProductService(new ProductDAO()), new CartService(new CartDAO()), true).start(); break;
                             case "S": new MainMenu(new CustomerService(new CustomerDAO())).start(); break menuExit;
                             case "U": updateInfo(customer);
                                 System.out.println("\nAccount information updated!");break menuExit;

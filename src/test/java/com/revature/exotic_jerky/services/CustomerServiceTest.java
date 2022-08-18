@@ -2,6 +2,7 @@ package com.revature.exotic_jerky.services;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +30,15 @@ public class CustomerServiceTest {
 
         // Assert
         Assert.assertTrue(flag);
+    }
+
+    @Test (expected = InvalidCustomerException.class)
+    public void test_isValidEmail_givenIncorrectEmail(){
+        // Arrange
+        String invalidEmail = ".testemail@originnet.";
+
+        // Act
+        sut.isValidEmail(invalidEmail);
     }
 
 }
