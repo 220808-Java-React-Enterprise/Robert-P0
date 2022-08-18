@@ -25,13 +25,17 @@ public class LoginMenu implements IMenu{
     // Purpose: To log in to a customers account
     @Override
     public void start() {
-        System.out.println("\nLets login!");
+        System.out.println("\nLets login! [M]ain Menu");
         String email, password;
 
         exit:{
             while (true){
                 System.out.print("\nEmail: ");
                 email = input.nextLine();
+
+                if (email.equalsIgnoreCase("M")){
+                    new MainMenu().start(); break exit;
+                }
 
                 signUpExit:{
                     if (!customerService.isDuplicateEmail(email)) {
