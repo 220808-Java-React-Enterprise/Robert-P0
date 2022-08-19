@@ -1,7 +1,6 @@
 package com.revature.exotic_jerky.models;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
-import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.ui.MainMenu;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
@@ -34,9 +33,6 @@ public class UpdateAccount {
                 System.out.println("[E]mail");
                 System.out.println("[P]assword");
                 System.out.println("[A]ddress");
-                System.out.println("[C]ity");
-                System.out.println("[S]tate");
-                System.out.println("[Z]ip");
                 System.out.println("P[h]one");
                 System.out.println("[B]ack/Cancel");
 
@@ -51,14 +47,12 @@ public class UpdateAccount {
                             System.out.println("\nE-mail updated"); break updateExit;
                         case "P": updated.setPassword(pass(customer.getPassword()));
                             System.out.println("\nPassword updated"); break updateExit;
-                        case "A": updated.setAddress(address());
+                        case "A":
+                            updated.setAddress(address());
+                            updated.setCity(city());
+                            updated.setState(state());
+                            updated.setZip(zip());
                             System.out.println("\nAddress updated"); break updateExit;
-                        case "C": updated.setCity(city());
-                            System.out.println("\nCity updated"); break updateExit;
-                        case "S": updated.setState(state());
-                            System.out.println("\nState updated"); break updateExit;
-                        case "Z": updated.setZip(zip());
-                            System.out.println("\nZip code updated"); break updateExit;
                         case "H": updated.setPhone(phone());
                             System.out.println("\nPhone number updated"); break updateExit;
                         case "M": new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true); break updateExit;
@@ -89,11 +83,18 @@ public class UpdateAccount {
     // Purpose: To print the Customers information
     public static void printSummaryOfCustomer(Customer customer){
         System.out.println("\nSummary:");
-        System.out.println("Name: " + customer.getfName() + " " + customer.getlName());
+        if (customer.getfName() != null && customer.getlName() != null)
+            System.out.println("Name: " + customer.getfName() + " " + customer.getlName());
+        else
+            System.out.printf("Name: " + customer.getfName());
+
         System.out.println("Email: " + customer.getEmail());
-        System.out.println("Address: " + customer.getAddress() + ", " + customer.getCity()
-                + ", " + customer.getState() + " " + customer.getZip());
-        System.out.println("Phone: " + customer.getPhone());
+
+        if (customer.getAddress() != null){
+            System.out.println("Address: " + customer.getAddress() + ", " + customer.getCity()
+                    + ", " + customer.getState() + " " + customer.getZip());
+            System.out.println("Phone: " + customer.getPhone());
+        }
     }
 
     // Pre: Non

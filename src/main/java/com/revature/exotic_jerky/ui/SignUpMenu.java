@@ -32,9 +32,8 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
         exit:{
             if (customer == null) break exit;
             while (true){
-                printSummaryOfCustomer(customer);
-
-                System.out.println("\nPlease confirm account Sign up " + customer.getfName() + "!");
+                System.out.println("\nEmail: " + customer.getEmail());
+                System.out.println("Please confirm account Sign up!");
                 System.out.println("[Y]es/[N]o/[U]pdate");
                 System.out.print("\nEnter: ");
 
@@ -55,7 +54,23 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                         new MainMenu(new CustomerService(new CustomerDAO())).start();
                         break exit;
                     case "U":
-                        customer = updateInfo(customer);
+                        updateExit:{
+                            System.out.println("\nWhat would you like to update!");
+                            System.out.println("[E]mail");
+                            System.out.println("[P]assword");
+
+                            while (true){
+                                System.out.print("\nEnter: ");
+                                switch (input.nextLine().toUpperCase()){
+                                    case "E": customer.setEmail(email());
+                                        System.out.println("\nEmail updated"); break updateExit;
+                                    case "P": customer.setPassword(pass());
+                                        System.out.println("\nLast name updated"); break updateExit;
+                                    default:
+                                        System.out.println("\nInvalid entry! Try Again...");
+                                }
+                            }
+                        } break;
                     default:
                         System.out.println("\nInvalid entry! Try Again...");
                         break;
@@ -70,17 +85,10 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
     public Customer signUp(){
         String[] inputs = new String[10];
         exit:{
-            for (int i = 0; i <= 8; i++){
+            for (int i = 0; i <= 1; i++){
                 switch (i){
                     case 0: inputs[0] = email(); break;
                     case 1: inputs[1] = pass(); break;
-                    case 2: inputs[2] = fName(); break;
-                    case 3: inputs[3] = lName(); break;
-                    case 4: inputs[4] = address(); break;
-                    case 5: inputs[5] = city(); break;
-                    case 6: inputs[6] = state(); break;
-                    case 7: inputs[7] = zip(); break;
-                    case 8: inputs[8] = phone(); break;
                 }
                 if (inputs[i].equalsIgnoreCase("M")){
                     new MainMenu(new CustomerService(new CustomerDAO())).start();
@@ -88,7 +96,6 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                 }
             }
         }
-        return new Customer(UUID.randomUUID().toString(),
-                inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7], inputs[8]);
+        return new Customer(inputs[0], inputs[1]);
     }
 }

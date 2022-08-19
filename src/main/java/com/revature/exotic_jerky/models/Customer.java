@@ -8,6 +8,13 @@ public class Customer {
     public Customer(){
         this.id = UUID.randomUUID().toString();
     }
+
+    public Customer(String email, String password){
+        this.id = UUID.randomUUID().toString();
+        this.email = email;
+        this.password = password;
+        this.role = "DEFAULT";
+    }
     public Customer(String id, String email, String password, String fName, String lName, String address, String city, String state, String zip, String phone) {
         this.id = id;
         this.email = email;

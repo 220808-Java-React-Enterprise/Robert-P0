@@ -54,7 +54,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
         exit:{
             while (true){
                 String input;
-                System.out.println("\nWelcome " + customer.getfName() + " to Exotic Jerky!");
+                System.out.println("\nWelcome to Exotic Jerky!");
 
                 menuExit:
                 {
