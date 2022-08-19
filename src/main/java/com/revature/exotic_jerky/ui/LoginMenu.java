@@ -1,9 +1,7 @@
 package com.revature.exotic_jerky.ui;
 
-import com.revature.exotic_jerky.daos.CartDAO;
 import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
-import com.revature.exotic_jerky.services.CartService;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 
@@ -45,10 +43,26 @@ public class LoginMenu implements IMenu{
                     new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                 }
 
+                if (!customerService.isDuplicateEmail(email)){
+                    System.out.println("\nUser doesn't exist");
+                    System.out.println("\nWould you like to sign up? [Y]es/[N]o");
+                    exitSignUp:{
+                        while(true){
+                            switch (input.nextLine().toUpperCase()){
+                                case "Y": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break exitSignUp;
+                                case "N": new MainMenu(new CustomerService(new CustomerDAO())).start(); break exitSignUp;
+                                default:
+                                    System.out.println("\nInvalid Entry.");
+                            }
+                        }
+                    }
+                }
+
                 try{
                     Customer customer = customerService.login(email, password);
                     if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new CustomerService(new CustomerDAO())).start();
-                    else new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
+                    else
+                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
                     break exit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());

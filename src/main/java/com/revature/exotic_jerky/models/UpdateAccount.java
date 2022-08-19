@@ -1,7 +1,9 @@
 package com.revature.exotic_jerky.models;
 
+import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.services.CustomerService;
+import com.revature.exotic_jerky.ui.MainMenu;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 
 import java.util.Scanner;
@@ -11,6 +13,9 @@ public class UpdateAccount {
 
     Scanner input = new Scanner(System.in);
 
+    // Pre: None
+    // Post: A instance of UpdateAccount is instantiated
+    // Purpose: Non-Default Constructor
     protected UpdateAccount(CustomerService customerService) {
         this.customerService = customerService;
     }
@@ -31,65 +36,64 @@ public class UpdateAccount {
     // Post: A Customer is returned with updated credentials
     // Purpose: To update a Customers credentials
     protected Customer updateInfo(Customer customer){
-        Customer updated = customer;
-        exit:{
-            while (true){
-                updateExit:{
-                    System.out.println("\nWhat would you like to update!");
-                    System.out.println("[F]irst Name");
-                    System.out.println("[L]ast Name");
-                    System.out.println("[E]mail");
-                    System.out.println("[P]assword");
-                    System.out.println("[A]ddress");
-                    System.out.println("[C]ity");
-                    System.out.println("[S]tate");
-                    System.out.println("[Z]ip");
-                    System.out.println("P[h]one");
-                    System.out.println("[B]ack/Cancel");
+        Customer updated = new Customer(customer);
 
-                    while (true){
-                        System.out.print("\nEnter: ");
-                        switch (input.nextLine().toUpperCase()){
-                            case "F": updated.setfName(fName());
-                                System.out.println("\nFirst name updated"); break updateExit;
-                            case "L": updated.setlName(lName());
-                                System.out.println("\nLast name updated"); break updateExit;
-                            case "E": updated.setEmail(email());
-                                System.out.println("\nE-mail updated"); break updateExit;
-                            case "P": updated.setPassword(pass(customer.getPassword()));
-                                System.out.println("\nPassword updated"); break updateExit;
-                            case "A": updated.setAddress(address());
-                                System.out.println("\nAddress updated"); break updateExit;
-                            case "C": updated.setCity(city());
-                                System.out.println("\nCity updated"); break updateExit;
-                            case "S": updated.setState(state());
-                                System.out.println("\nState updated"); break updateExit;
-                            case "Z": updated.setZip(zip());
-                                System.out.println("\nZip code updated"); break updateExit;
-                            case "H": updated.setPhone(phone());
-                                System.out.println("\nPhone number updated"); break updateExit;
-                            case "B": return customer;
-                            default: System.out.println("\nInvalid entry! Try Again...");
-                        }
+        while (true){
+            updateExit:{
+                System.out.println("\nWhat would you like to update!");
+                System.out.println("[F]irst Name");
+                System.out.println("[L]ast Name");
+                System.out.println("[E]mail");
+                System.out.println("[P]assword");
+                System.out.println("[A]ddress");
+                System.out.println("[C]ity");
+                System.out.println("[S]tate");
+                System.out.println("[Z]ip");
+                System.out.println("P[h]one");
+                System.out.println("[B]ack/Cancel");
+
+                while (true){
+                    System.out.print("\nEnter: ");
+                    switch (input.nextLine().toUpperCase()){
+                        case "F": updated.setfName(fName());
+                            System.out.println("\nFirst name updated"); break updateExit;
+                        case "L": updated.setlName(lName());
+                            System.out.println("\nLast name updated"); break updateExit;
+                        case "E": updated.setEmail(email());
+                            System.out.println("\nE-mail updated"); break updateExit;
+                        case "P": updated.setPassword(pass(customer.getPassword()));
+                            System.out.println("\nPassword updated"); break updateExit;
+                        case "A": updated.setAddress(address());
+                            System.out.println("\nAddress updated"); break updateExit;
+                        case "C": updated.setCity(city());
+                            System.out.println("\nCity updated"); break updateExit;
+                        case "S": updated.setState(state());
+                            System.out.println("\nState updated"); break updateExit;
+                        case "Z": updated.setZip(zip());
+                            System.out.println("\nZip code updated"); break updateExit;
+                        case "H": updated.setPhone(phone());
+                            System.out.println("\nPhone number updated"); break updateExit;
+                        case "M": new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true); break updateExit;
+                        case "B": return customer;
+                        default: System.out.println("\nInvalid entry! Try Again...");
                     }
                 }
-                verifyExit:{
-                    while (true){
-                        printSummaryOfCustomer(updated);
-                        System.out.println("\nUpdate More? [Y]es/[N]o/[C]ancel");
-                        System.out.print("Enter: ");
+            }
+            verifyExit:{
+                while (true){
+                    printSummaryOfCustomer(updated);
+                    System.out.println("\nUpdate More? [Y]es/[N]o/[C]ancel");
+                    System.out.print("Enter: ");
 
-                        switch(input.nextLine().toUpperCase()){
-                            case "Y": break verifyExit;
-                            case "N": customerService.updateAccount(updated); break exit;
-                            case "C": return customer;
-                            default: System.out.println("\nInvalid entry! Try Again...");
-                        }
+                    switch(input.nextLine().toUpperCase()){
+                        case "Y": break verifyExit;
+                        case "N": customerService.updateAccount(updated); return updated;
+                        case "C": return customer;
+                        default: System.out.println("\nInvalid entry! Try Again...");
                     }
                 }
             }
         }
-        return updated;
     }
 
     // Pre: Non
@@ -101,6 +105,10 @@ public class UpdateAccount {
             while (true){
                 System.out.print("\nFirst Name: ");
                 fName = input.nextLine();
+
+                if (fName.equalsIgnoreCase("M"))
+                    return "M";
+
                 fName = fName.substring(0,1).toUpperCase() + fName.substring(1).toLowerCase();
 
                 try{
@@ -123,6 +131,10 @@ public class UpdateAccount {
             while (true) {
                 System.out.print("\nLast Name: ");
                 lName = input.nextLine();
+
+                if (lName.equalsIgnoreCase("M"))
+                    return "M";
+
                 lName = lName.substring(0,1).toUpperCase() + lName.substring(1).toLowerCase();
 
                 try{
@@ -146,6 +158,9 @@ public class UpdateAccount {
                 System.out.print("\nE-mail: ");
                 email = input.nextLine();
 
+                if (email.equalsIgnoreCase("M"))
+                    return "M";
+
                 try{
                     if (customerService.isDuplicateEmail(email))
                         System.out.println(email + " already exists.");
@@ -168,6 +183,9 @@ public class UpdateAccount {
             while (true){
                 System.out.print("\nEnter a password: ");
                 pass = input.nextLine();
+
+                if (pass.equalsIgnoreCase("M"))
+                    return "M";
 
                 try{
                     customerService.isValidPassword(pass);
@@ -252,6 +270,9 @@ public class UpdateAccount {
                 System.out.print("Street Address: ");
                 address = input.nextLine();
 
+                if (address.equalsIgnoreCase("M"))
+                    return "M";
+
                 try{
                     customerService.isValidAddress(address);
                     address = address.toUpperCase();
@@ -273,6 +294,10 @@ public class UpdateAccount {
             while (true){
                 System.out.print("\nCity: ");
                 city = input.nextLine();
+
+                if (city.equalsIgnoreCase("M"))
+                    return "M";
+
                 city = city.substring(0,1).toUpperCase() + city.substring(1);
 
                 try{
@@ -297,6 +322,9 @@ public class UpdateAccount {
                 System.out.print("State: ");
                 state = input.nextLine().toUpperCase();
 
+                if (state.equalsIgnoreCase("M"))
+                    return "M";
+
                 try{
                     customerService.isValidState(state);
                     break stateExit;
@@ -319,6 +347,9 @@ public class UpdateAccount {
                 System.out.print("Zip: ");
                 zip = input.nextLine();
 
+                if (zip.equalsIgnoreCase("M"))
+                    return "M";
+
                 try{
                     customerService.isValidZip(zip);
                     break zipExit;
@@ -340,6 +371,9 @@ public class UpdateAccount {
                 System.out.println("\nFormat ###-###-####");
                 System.out.print("Phone: ");
                 phone = input.nextLine();
+
+                if (phone.equalsIgnoreCase("M"))
+                    return "M";
 
                 try{
                     customerService.isValidPhone(phone);

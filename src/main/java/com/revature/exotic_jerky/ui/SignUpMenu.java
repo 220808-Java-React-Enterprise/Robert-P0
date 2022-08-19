@@ -25,29 +25,27 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
     // Purpose: To sign up a customer to the database
     @Override
     public void start() {
-        System.out.println("Sign Up!");
+        System.out.println("Sign Up! Or [M]enu anytime");
 
-        Customer customer = new Customer(UUID.randomUUID().toString(),
-                fName(), lName(), email(), pass(), address(), city(), state(), zip(), phone());
+        Customer customer = signUp();
 
-        Exit:{
+        exit:{
+            if (customer == null) break exit;
             while (true){
                 printSummaryOfCustomer(customer);
 
                 System.out.println("\nPlease confirm account Sign up " + customer.getfName() + "!");
-                System.out.println("[Y]es");
-                System.out.println("[N]o");
-                System.out.println("[U]pdate");
+                System.out.println("[Y]es/[N]o/[U]pdate");
                 System.out.print("\nEnter: ");
 
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
                         customerService.signUp(customer);
                         new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
-                        break Exit;
+                        break exit;
                     case "N":
                         new MainMenu(new CustomerService(new CustomerDAO())).start();
-                        break Exit;
+                        break exit;
                     case "U":
                         customer = updateInfo(customer);
                     default:
@@ -56,5 +54,33 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                 }
             }
         }
+    }
+
+    // Pre: start() is called
+    // Post: A customer is returned, null if user cancels
+    // Purpose: To verify between signup steps if user wants to cancel
+    public Customer signUp(){
+        String[] inputs = new String[10];
+        exit:{
+            for (int i = 0; i <= 8; i++){
+                switch (i){
+                    case 0: inputs[0] = fName(); break;
+                    case 1: inputs[1] = lName(); break;
+                    case 2: inputs[2] = email(); break;
+                    case 3: inputs[3] = pass(); break;
+                    case 4: inputs[4] = address(); break;
+                    case 5: inputs[5] = city(); break;
+                    case 6: inputs[6] = state(); break;
+                    case 7: inputs[7] = zip(); break;
+                    case 8: inputs[8] = phone(); break;
+                }
+                if (inputs[i].equalsIgnoreCase("M")){
+                    new MainMenu(new CustomerService(new CustomerDAO())).start();
+                    return null;
+                }
+            }
+        }
+        return new Customer(UUID.randomUUID().toString(),
+                inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7], inputs[8]);
     }
 }

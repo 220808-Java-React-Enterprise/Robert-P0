@@ -36,6 +36,20 @@ public class Customer {
         this.role = role;
     }
 
+    public Customer(Customer customer) {
+        this.id = customer.getId();
+        this.fName = customer.getfName();
+        this.lName = customer.getlName();
+        this.email = customer.getEmail();
+        this.password = customer.getPassword();
+        this.address = customer.getAddress();
+        this.city = customer.getCity();
+        this.state = customer.getState();
+        this.zip = customer.getZip();
+        this.phone = customer.getPhone();
+        this. role = customer.getRole();
+    }
+
     @Override
     public String toString() {
         return "Customer{" +

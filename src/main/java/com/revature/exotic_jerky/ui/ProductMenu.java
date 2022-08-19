@@ -12,36 +12,31 @@ import java.util.*;
 
 public class ProductMenu implements IMenu{
     private final Customer customer;
+    private final Cart cart;
     private final CustomerService customerService;
-    private Cart cart;
-
     private final ProductService productService;
     private final CartService cartService;
 
     Scanner input = new Scanner(System.in);
-
     private boolean isLoggedIn;
 
+    // Pre: None
+    // Post: A new instance of ProductMenu is initialized
+    // Purpose: To instantiate a new instance of ProductMenu
     public ProductMenu(Customer customer, CustomerService customerService, ProductService productService, CartService cartService, boolean loggedIn) {
         this.customer = customer;
         this.customerService = customerService;
         this.productService = productService;
         this.cartService = cartService;
         this.isLoggedIn = loggedIn;
+        this.cart = isLoggedInGetCart(loggedIn);
     }
 
+    // Pre: Product is selected from the MainMenu
+    // Post: A customer is brought to the product menu
+    // Purpose: To start a product menu
     @Override
     public void start() {
-        if (isLoggedIn) {
-            System.out.println("\nWelcome " + customer.getfName() + "!");
-            cart = cartService.hasExistingCart(customer.getId());
-        }
-        else{
-            System.out.println("Welcome to our Product!");
-            customerService.signUp(customer);
-            cart = new Cart(UUID.randomUUID().toString(), 0.00f, new Date(), customer.getId() );
-            cartService.saveCart(cart);
-        }
         exit:{
             while (true){
                 System.out.println("\nShop by...");
@@ -88,6 +83,26 @@ public class ProductMenu implements IMenu{
         }
     }
 
+    // Pre: Pre
+    // Post:
+    // Purpose:
+    private Cart isLoggedInGetCart(boolean isLoggedIn){
+        if (isLoggedIn) {
+            System.out.println("\nWelcome " + customer.getfName() + "!");
+            return cartService.hasExistingCart(customer.getId());
+        }
+        else{
+            System.out.println("Welcome to our Product!");
+            customerService.signUp(customer);
+            Cart newCart = new Cart(UUID.randomUUID().toString(), 0.00f, new Date(), customer.getId() );
+            cartService.saveCart(newCart);
+            return newCart;
+        }
+    }
+
+    // Pre: ProductMenu must be started
+    // Post: A list of products at a specific category is printed
+    // Purpose: To print to the user all products from a specific category
     private Map<String, Product> getProductListAndPrint(String category){
         Map<String, Product> productMap = productService.getProduct(category);
         int index = 1, maxStrLengh = 30;
@@ -115,6 +130,9 @@ public class ProductMenu implements IMenu{
         return productMap;
     }
 
+    // Pre: A list of products is displayed to the user
+    // Post:
+    // Purpose:
     private void select(Map<String, Product> productMap, String category){
         exit:{
             while (true){
@@ -130,45 +148,9 @@ public class ProductMenu implements IMenu{
 
                     System.out.println("\nWould you like to add " + products[index - 1].getName() + " to your cart? [Y]es/[N]o");
 
-                    exitConfirmation:{
-                        while (true){
-                            System.out.print("Enter: ");
-                            // Get input
-                            switch (input.nextLine().toUpperCase()){
-                                case "Y":
-                                    // Get quantity
-                                    while (true){
-                                        System.out.println("\n[C]ancel");
-                                        System.out.print("Quantity: ");
-                                        String str = input.nextLine();
+                    selection = addToCart(products, index, category);
 
-                                        // Check if they want to cancel
-                                        if (str.equalsIgnoreCase("C"))
-                                            break exit;
-                                        // Verify they entered a numeric value
-                                        try{
-                                            byte quantity = (byte)Integer.parseInt(str);
-                                            // Insert into cart
-                                            if (quantity < products[index - 1].getQuantity()){
-                                                float total = quantity * products[index - 1].getPrice();
-                                                cart.setTotal(cart.getTotal() + total);
-                                                cartService.updateCartTotal(cart);
-                                                cartService.addToCart(cart, quantity, total, products[index - 1]);
-                                                isLoggedIn = true;
-                                                System.out.println("\nAdded to cart!");
-                                                getProductListAndPrint(category);
-                                                break exitConfirmation;
-                                            }
-                                        } catch (NumberFormatException e){
-                                            System.out.println("\nInvalid Input. Must be a numeric value.");
-                                        }
-                                    }
-                                case "N": getProductListAndPrint(category); break exitConfirmation;
-                                default:
-                                    System.out.println("\nInvalid entry try again"); break;
-                            }
-                        }
-                    }
+                    if (selection.equalsIgnoreCase("C")) break exit;
 
                 } catch (NumberFormatException e){
                     System.out.println("\nInvalid Input. Must be a numeric value.");
@@ -177,5 +159,51 @@ public class ProductMenu implements IMenu{
                 }
             }
         }
+    }
+
+    // Pre:
+    // Post:
+    // Purpose:
+    private String addToCart(Product[] products, int index, String category){
+        exitConfirmation:{
+            while (true){
+                System.out.print("Enter: ");
+                // Get input
+                switch (input.nextLine().toUpperCase()){
+                    case "Y":
+                        // Get quantity
+                        while (true){
+                            System.out.println("\n[C]ancel");
+                            System.out.print("Quantity: ");
+                            String str = input.nextLine();
+
+                            // Check if they want to cancel
+                            if (str.equalsIgnoreCase("C"))
+                                return str;
+                            // Verify they entered a numeric value
+                            try{
+                                byte quantity = (byte)Integer.parseInt(str);
+                                // Insert into cart
+                                if (quantity < products[index - 1].getQuantity()){
+                                    float total = quantity * products[index - 1].getPrice();
+                                    cart.setTotal(cart.getTotal() + total);
+                                    cartService.updateCartTotal(cart);
+                                    cartService.addToCart(cart, quantity, total, products[index - 1]);
+                                    isLoggedIn = true;
+                                    System.out.println("\nAdded to cart!");
+                                    getProductListAndPrint(category);
+                                    break exitConfirmation;
+                                }
+                            } catch (NumberFormatException e){
+                                System.out.println("\nInvalid Input. Must be a numeric value.");
+                            }
+                        }
+                    case "N": getProductListAndPrint(category); break exitConfirmation;
+                    default:
+                        System.out.println("\nInvalid entry try again"); break;
+                }
+            }
+        }
+        return "";
     }
 }
