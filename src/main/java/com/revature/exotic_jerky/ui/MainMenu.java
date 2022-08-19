@@ -3,11 +3,13 @@ package com.revature.exotic_jerky.ui;
 import com.revature.exotic_jerky.daos.CartDAO;
 import com.revature.exotic_jerky.daos.CustomerDAO;
 import com.revature.exotic_jerky.daos.ProductDAO;
+import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.models.UpdateAccount;
 import com.revature.exotic_jerky.services.CartService;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.services.ProductService;
+import com.revature.exotic_jerky.services.StoreService;
 
 import java.util.Scanner;
 
@@ -39,7 +41,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                 switch (scan.nextLine().toUpperCase()){
                     case "P": new ProductMenu(new Customer(), new CustomerService(new CustomerDAO()), new ProductService(new ProductDAO()), new CartService(new CartDAO()), false).start(); break exit;
                     case "L": new LoginMenu(new CustomerService(new CustomerDAO())).start(); break exit;
-                    case "S": new SignUpMenu(new CustomerService(new CustomerDAO())).start(); break exit;
+                    case "S": new SignUpMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(); break exit;
                     case "X":
                         System.out.println("Thanks for Visiting! Hope to see you again!"); break exit;
                 }

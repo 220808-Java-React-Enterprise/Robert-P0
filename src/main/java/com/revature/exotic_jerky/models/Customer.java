@@ -7,6 +7,7 @@ public class Customer {
 
     public Customer(){
         this.id = UUID.randomUUID().toString();
+        this.role = "DEFAULT";
     }
 
     public Customer(String email, String password){

@@ -1,23 +1,28 @@
 package com.revature.exotic_jerky.ui;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.models.Store;
 import com.revature.exotic_jerky.models.UpdateAccount;
 import com.revature.exotic_jerky.services.CustomerService;
+import com.revature.exotic_jerky.services.StoreService;
 
 import java.util.Scanner;
 import java.util.UUID;
 
 public class SignUpMenu extends UpdateAccount implements IMenu{
     private final CustomerService customerService;
+    private final StoreService storeService;
     Scanner input = new Scanner(System.in);
 
     // Pre: None
     // Post: A instance of the SignUpMenu is instantiated
     // Purpose: To instantiate a SignUpMenu
-    public SignUpMenu(CustomerService customer) {
+    public SignUpMenu(CustomerService customer, StoreService storeService) {
         super(customer);
         this.customerService = customer;
+        this.storeService = storeService;
     }
 
     // Pre: A new instance of SignUpMenu is called
@@ -40,14 +45,24 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
                         String email = customer.getEmail();
-                        customerService.signUp(customer);
 
                         if (email.substring(email.indexOf("@")).equals("@exoticjerky.com"))
                             if (customer.getPassword().equals("admin213")){
-                                new AdminMenu(new Customer(), new CustomerService(new CustomerDAO())).start();
-                                break exit;
-                            }
+                                customer.setRole("ADMIN");
+                                customer.setfName(fName()); customer.setAddress(address());
+                                customer.setCity(city()); customer.setState(state());
+                                customer.setZip(zip()); customer.setPhone(phone());
 
+                                if (!storeService.isDuplicateStore(customer.getAddress())){
+                                    Store store = new Store(UUID.randomUUID().toString(), "Exotic Jerky", customer.getAddress(),
+                                            customer.getCity(), customer.getState(), customer.getZip(), customer.getPhone());
+
+                                    customerService.signUp(customer);
+                                    storeService.saveStore(store);
+                                    new AdminMenu(new Customer(), new StoreService(new StoreDAO()), new CustomerService(new CustomerDAO())).start();
+                                } break exit;
+                            }
+                        customerService.signUp(customer);
                         new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
                         break exit;
                     case "N":
