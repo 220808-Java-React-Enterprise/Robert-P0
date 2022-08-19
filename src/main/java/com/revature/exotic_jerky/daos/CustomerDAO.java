@@ -87,8 +87,8 @@ public class CustomerDAO implements CrudDAO<Customer>{
             ps.setString(1, email); ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) return new Customer(rs.getString("id"), rs.getString("fname"), rs.getString("lname"), rs.getString("email"),
-                    rs.getString("password"), rs.getString("address"), rs.getString("city"), rs.getString("state"), rs.getString("zip"),
+            if (rs.next()) return new Customer(rs.getString("id"), rs.getString("email"), rs.getString("password"), rs.getString("fname"),
+                    rs.getString("lname"), rs.getString("address"), rs.getString("city"), rs.getString("state"), rs.getString("zip"),
                     rs.getString("phone"),rs.getString("role"));
         } catch (SQLException e){
             throw new InvalidSQLException("Error finding user");

@@ -8,12 +8,12 @@ public class Customer {
     public Customer(){
         this.id = UUID.randomUUID().toString();
     }
-    public Customer(String id, String fName, String lName, String email, String password, String address, String city, String state, String zip, String phone) {
+    public Customer(String id, String email, String password, String fName, String lName, String address, String city, String state, String zip, String phone) {
         this.id = id;
-        this.fName = fName;
-        this.lName = lName;
         this.email = email;
         this.password = password;
+        this.fName = fName;
+        this.lName = lName;
         this.address = address;
         this.city = city;
         this.state = state;
@@ -22,12 +22,12 @@ public class Customer {
         this.role = "DEFAULT";
     }
 
-    public Customer(String id, String fName, String lName, String email, String password, String address, String city, String state, String zip, String phone, String role) {
+    public Customer(String id, String email, String password, String fName, String lName, String address, String city, String state, String zip, String phone, String role) {
         this.id = id;
-        this.fName = fName;
-        this.lName = lName;
         this.email = email;
         this.password = password;
+        this.fName = fName;
+        this.lName = lName;
         this.address = address;
         this.city = city;
         this.state = state;
@@ -38,10 +38,10 @@ public class Customer {
 
     public Customer(Customer customer) {
         this.id = customer.getId();
-        this.fName = customer.getfName();
-        this.lName = customer.getlName();
         this.email = customer.getEmail();
         this.password = customer.getPassword();
+        this.fName = customer.getfName();
+        this.lName = customer.getlName();
         this.address = customer.getAddress();
         this.city = customer.getCity();
         this.state = customer.getState();

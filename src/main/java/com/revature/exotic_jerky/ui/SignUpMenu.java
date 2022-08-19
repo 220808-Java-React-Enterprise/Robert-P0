@@ -40,7 +40,15 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
 
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
+                        String email = customer.getEmail();
                         customerService.signUp(customer);
+
+                        if (email.substring(email.indexOf("@")).equals("@exoticjerky.com"))
+                            if (customer.getPassword().equals("admin213")){
+                                new AdminMenu(new Customer(), new CustomerService(new CustomerDAO())).start();
+                                break exit;
+                            }
+
                         new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
                         break exit;
                     case "N":
@@ -64,10 +72,10 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
         exit:{
             for (int i = 0; i <= 8; i++){
                 switch (i){
-                    case 0: inputs[0] = fName(); break;
-                    case 1: inputs[1] = lName(); break;
-                    case 2: inputs[2] = email(); break;
-                    case 3: inputs[3] = pass(); break;
+                    case 0: inputs[0] = email(); break;
+                    case 1: inputs[1] = pass(); break;
+                    case 2: inputs[2] = fName(); break;
+                    case 3: inputs[3] = lName(); break;
                     case 4: inputs[4] = address(); break;
                     case 5: inputs[5] = city(); break;
                     case 6: inputs[6] = state(); break;

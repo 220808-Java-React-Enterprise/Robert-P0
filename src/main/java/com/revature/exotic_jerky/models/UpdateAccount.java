@@ -20,18 +20,6 @@ public class UpdateAccount {
         this.customerService = customerService;
     }
 
-    // Pre: A instance of Customer must be instantiated
-    // Post: A summary of the Customers credentials is printed
-    // Purpose: To print the Customers information
-    public static void printSummaryOfCustomer(Customer customer){
-        System.out.println("\nSummary:");
-        System.out.println("Name: " + customer.getfName() + " " + customer.getlName());
-        System.out.println("Email: " + customer.getEmail());
-        System.out.println("Address: " + customer.getAddress() + ", " + customer.getCity()
-                + ", " + customer.getState() + " " + customer.getZip());
-        System.out.println("Phone: " + customer.getPhone());
-    }
-
     // Pre: A Customer has been instantiated, and they request to update
     // Post: A Customer is returned with updated credentials
     // Purpose: To update a Customers credentials
@@ -96,56 +84,16 @@ public class UpdateAccount {
         }
     }
 
-    // Pre: Non
-    // Post: A String value is returned
-    // Purpose: To get users input for their first name
-    protected String fName(){
-        String fName;
-        fNameExit:{
-            while (true){
-                System.out.print("\nFirst Name: ");
-                fName = input.nextLine();
-
-                if (fName.equalsIgnoreCase("M"))
-                    return "M";
-
-                fName = fName.substring(0,1).toUpperCase() + fName.substring(1).toLowerCase();
-
-                try{
-                    customerService.isValidName(fName);
-                    break fNameExit;
-                }catch(InvalidCustomerException e){
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
-        return fName;
-    }
-
-    // Pre: Non
-    // Post: A String value is returned
-    // Purpose: To get users input for their last name
-    protected String lName(){
-        String lName;
-        lNameExit:{
-            while (true) {
-                System.out.print("\nLast Name: ");
-                lName = input.nextLine();
-
-                if (lName.equalsIgnoreCase("M"))
-                    return "M";
-
-                lName = lName.substring(0,1).toUpperCase() + lName.substring(1).toLowerCase();
-
-                try{
-                    customerService.isValidName(lName);
-                    break lNameExit;
-                }catch(InvalidCustomerException e){
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
-        return lName;
+    // Pre: A instance of Customer must be instantiated
+    // Post: A summary of the Customers credentials is printed
+    // Purpose: To print the Customers information
+    public static void printSummaryOfCustomer(Customer customer){
+        System.out.println("\nSummary:");
+        System.out.println("Name: " + customer.getfName() + " " + customer.getlName());
+        System.out.println("Email: " + customer.getEmail());
+        System.out.println("Address: " + customer.getAddress() + ", " + customer.getCity()
+                + ", " + customer.getState() + " " + customer.getZip());
+        System.out.println("Phone: " + customer.getPhone());
     }
 
     // Pre: Non
@@ -164,8 +112,10 @@ public class UpdateAccount {
                 try{
                     if (customerService.isDuplicateEmail(email))
                         System.out.println(email + " already exists.");
-                    customerService.isValidEmail(email);
-                    break emailExit;
+                    else{
+                        customerService.isValidEmail(email);
+                        break emailExit;
+                    }
                 }catch(InvalidCustomerException e){
                     System.out.println(e.getMessage());
                 }
@@ -257,6 +207,58 @@ public class UpdateAccount {
         }
 
         return newPass;
+    }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their first name
+    protected String fName(){
+        String fName;
+        fNameExit:{
+            while (true){
+                System.out.print("\nFirst Name: ");
+                fName = input.nextLine();
+
+                if (fName.equalsIgnoreCase("M"))
+                    return "M";
+
+                fName = fName.substring(0,1).toUpperCase() + fName.substring(1).toLowerCase();
+
+                try{
+                    customerService.isValidName(fName);
+                    break fNameExit;
+                }catch(InvalidCustomerException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return fName;
+    }
+
+    // Pre: Non
+    // Post: A String value is returned
+    // Purpose: To get users input for their last name
+    protected String lName(){
+        String lName;
+        lNameExit:{
+            while (true) {
+                System.out.print("\nLast Name: ");
+                lName = input.nextLine();
+
+                if (lName.equalsIgnoreCase("M"))
+                    return "M";
+
+                lName = lName.substring(0,1).toUpperCase() + lName.substring(1).toLowerCase();
+
+                try{
+                    customerService.isValidName(lName);
+                    break lNameExit;
+                }catch(InvalidCustomerException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return lName;
     }
 
     // Pre: Non

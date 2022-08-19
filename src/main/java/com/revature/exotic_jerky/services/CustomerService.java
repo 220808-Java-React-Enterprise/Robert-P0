@@ -63,7 +63,7 @@ public class CustomerService {
     // Post:
     // Purpose:
     public boolean isValidEmail(String email){
-        if (!email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"))
+        if (!email.matches("[A-Za-z0-9][A-Za-z0-9\\!\\#\\$\\%\\&\\'\\*\\+\\-\\/\\=\\?\\^\\_\\`\\{\\}\\|]{0,63}@[A-Za-z0-9.-]{1,253}.[A-Za-z]{2,24}"))
             throw new InvalidCustomerException("\nInvalid email format!");
         return true;
     }
