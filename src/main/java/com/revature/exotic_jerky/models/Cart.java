@@ -10,31 +10,11 @@ public class Cart {
     // Pre:
     // Post:
     // Purpose:
-    public Cart(String id, String customerID) {
+    public Cart(String id, float total, Date date, String customerID) {
         this.id = id;
-        this.customerID = customerID;
-        this.date = new Date();
-        this.total = 0.00f;
-    }
-
-    // Pre:
-    // Post:
-    // Purpose:
-    public Cart(String id, String customerID, Date date) {
-        this.id = id;
-        this.customerID = customerID;
-        this.date = date;
-        this.total = 0.00f;
-    }
-
-    // Pre:
-    // Post:
-    // Purpose:
-    public Cart(String id, String customerID, Date date, float total) {
-        this.id = id;
-        this.customerID = customerID;
-        this.date = date;
         this.total = total;
+        this.date = new Date();
+        this.customerID = customerID;
     }
 
     public String getId() {

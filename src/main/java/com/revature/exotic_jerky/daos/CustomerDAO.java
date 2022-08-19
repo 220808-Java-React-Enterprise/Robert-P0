@@ -48,7 +48,13 @@ public class CustomerDAO implements CrudDAO<Customer>{
 
     @Override
     public void delete(String id) {
-
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("DELETE FROM customers WHERE id = ?");
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to delete from database");
+        }
     }
 
     @Override

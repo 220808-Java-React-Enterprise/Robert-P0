@@ -19,8 +19,4 @@ public class CartMenu implements IMenu{
     public void start() {
 
     }
-
-    private void getCart(){
-
-    }
 }

@@ -47,6 +47,13 @@ public class CustomerService {
     // Pre:
     // Post:
     // Purpose:
+    public void deleteCustomer(String customerID){
+        customerDAO.delete(customerID);
+    }
+
+    // Pre:
+    // Post:
+    // Purpose:
     public boolean isValidName(String name){
         if (!name.matches("^[\\p{L} .'-]+$")) throw new InvalidCustomerException("\nInvalid format!");
         return true;

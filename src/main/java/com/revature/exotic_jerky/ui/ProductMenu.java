@@ -20,7 +20,7 @@ public class ProductMenu implements IMenu{
 
     Scanner input = new Scanner(System.in);
 
-    private final boolean isLoggedIn;
+    private boolean isLoggedIn;
 
     public ProductMenu(Customer customer, CustomerService customerService, ProductService productService, CartService cartService, boolean loggedIn) {
         this.customer = customer;
@@ -39,7 +39,7 @@ public class ProductMenu implements IMenu{
         else{
             System.out.println("Welcome to our Product!");
             customerService.signUp(customer);
-            cart = new Cart(UUID.randomUUID().toString(), customer.getId(), new Date(), 0.00f );
+            cart = new Cart(UUID.randomUUID().toString(), 0.00f, new Date(), customer.getId() );
             cartService.saveCart(cart);
         }
         exit:{
@@ -54,7 +54,6 @@ public class ProductMenu implements IMenu{
 
                 categoryExit:{
                     while (true){
-                        System.out.println("\n[B]ack");
                         System.out.print("Enter: ");
                         String category = input.nextLine().toUpperCase();
 
@@ -62,28 +61,30 @@ public class ProductMenu implements IMenu{
 
                         Map<String, Product> productMap;
 
-                        catExit:{
-                            switch(category){
-                                case "S": productMap = getProductListAndPrint("SPICY");
-                                    select(productMap); break catExit;
-                                case "W": productMap = getProductListAndPrint("SWEET");
-                                    select(productMap); break catExit;
-                                case "O": productMap = getProductListAndPrint("ORIGINAL");
-                                    select(productMap); break catExit;
-                                case "C": new CartMenu(customer, cart, cartService).start();
-                                case "M":
-                                    if (isLoggedIn)
-                                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
-                                    new MainMenu(new CustomerService(new CustomerDAO())).start();
-                                    break exit;
-                                case "X": break exit;
-                                default:
-                                    System.out.println("\nInvalid entry. Try again"); break;
-                            }
+                        switch(category){
+                            case "S": productMap = getProductListAndPrint("SPICY");
+                                select(productMap, "SPICY"); break categoryExit;
+                            case "W": productMap = getProductListAndPrint("SWEET");
+                                select(productMap, "SWEET"); break categoryExit;
+                            case "O": productMap = getProductListAndPrint("ORIGINAL");
+                                select(productMap, "ORIGINAL"); break categoryExit;
+                            case "C": new CartMenu(customer, cart, cartService).start();
+                            case "M":
+                                if (isLoggedIn)
+                                    new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
+                                new MainMenu(new CustomerService(new CustomerDAO())).start();
+                                break exit;
+                            case "X": break exit;
+                            default:
+                                System.out.println("\nInvalid entry. Try again"); break;
                         }
                     }
                 }
             }
+        }
+        if (!isLoggedIn){
+            cartService.deleteCartByCustomerID(customer.getId());
+            customerService.deleteCustomer(customer.getId());
         }
     }
 
@@ -114,7 +115,7 @@ public class ProductMenu implements IMenu{
         return productMap;
     }
 
-    private void select(Map<String, Product> productMap){
+    private void select(Map<String, Product> productMap, String category){
         exit:{
             while (true){
                 System.out.println("\nEnter [B]ack");
@@ -149,15 +150,20 @@ public class ProductMenu implements IMenu{
                                             byte quantity = (byte)Integer.parseInt(str);
                                             // Insert into cart
                                             if (quantity < products[index - 1].getQuantity()){
-                                                cartService.addToCart(cart, quantity, products[index - 1]);
+                                                float total = quantity * products[index - 1].getPrice();
+                                                cart.setTotal(cart.getTotal() + total);
+                                                cartService.updateCartTotal(cart);
+                                                cartService.addToCart(cart, quantity, total, products[index - 1]);
+                                                isLoggedIn = true;
                                                 System.out.println("\nAdded to cart!");
-                                                break exit;
+                                                getProductListAndPrint(category);
+                                                break exitConfirmation;
                                             }
                                         } catch (NumberFormatException e){
                                             System.out.println("\nInvalid Input. Must be a numeric value.");
                                         }
                                     }
-                                case "N": break exitConfirmation;
+                                case "N": getProductListAndPrint(category); break exitConfirmation;
                                 default:
                                     System.out.println("\nInvalid entry try again"); break;
                             }

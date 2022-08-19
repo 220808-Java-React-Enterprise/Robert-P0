@@ -67,12 +67,12 @@ public class MainMenu extends UpdateAccount implements IMenu{
                         System.out.print("\nEnter: ");
 
                         switch (scan.nextLine().toUpperCase()){
-                            case "P": new ProductMenu(customer, new CustomerService(new CustomerDAO()), new ProductService(new ProductDAO()), new CartService(new CartDAO()), true).start(); break;
-                            case "S": new MainMenu(new CustomerService(new CustomerDAO())).start(); break menuExit;
+                            case "P": new ProductMenu(customer, new CustomerService(new CustomerDAO()), new ProductService(new ProductDAO()), new CartService(new CartDAO()), loggedIn).start(); break exit;
+                            case "S": new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
                             case "U": updateInfo(customer);
                                 System.out.println("\nAccount information updated!");break menuExit;
                             case "X":
-                                System.out.println("Thanks for Visiting! Hope to see you again!"); break exit;
+                                System.out.println("Thanks for Visiting! Hope to see you again!"); System.exit(0);
                         }
                     }
                 }
