@@ -10,8 +10,9 @@ public class Customer {
         this.role = "DEFAULT";
     }
 
-    public Customer(String email, String password){
+    public Customer(String fName, String email, String password){
         this.id = UUID.randomUUID().toString();
+        this.fName = fName;
         this.email = email;
         this.password = password;
         this.role = "DEFAULT";

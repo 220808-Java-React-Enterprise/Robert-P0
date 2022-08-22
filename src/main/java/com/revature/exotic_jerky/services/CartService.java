@@ -23,7 +23,6 @@ public class CartService {
         Cart cart = cartDAO.getCartByCustomerID(customerID);
         if (cart == null){
             cart = new Cart(UUID.randomUUID().toString(), 0.00f, new Date(), customerID);
-            saveCart(cart);
         }
         return cart;
     }
@@ -52,7 +51,11 @@ public class CartService {
         cartDAO.delete(customerID);
     }
 
-    public Map<String, List<String>> getCheckOutCart(){
-        return null;
+    public void deleteCartJCT(String cartID){
+        cartDAO.deleteCartJCTByCartID(cartID);
+    }
+
+    public Map<String, List<String>> getCheckOutCart(String customerID){
+        return cartDAO.getCheckOutCart(customerID);
     }
 }

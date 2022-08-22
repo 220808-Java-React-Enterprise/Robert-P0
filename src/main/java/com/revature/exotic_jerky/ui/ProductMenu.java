@@ -1,12 +1,14 @@
 package com.revature.exotic_jerky.ui;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.models.Cart;
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.services.CartService;
 import com.revature.exotic_jerky.services.CustomerService;
 import com.revature.exotic_jerky.services.ProductService;
+import com.revature.exotic_jerky.services.StoreService;
 
 import java.util.*;
 
@@ -63,13 +65,24 @@ public class ProductMenu implements IMenu{
                                 select(productMap, "SWEET"); break categoryExit;
                             case "O": productMap = getProductListAndPrint("ORIGINAL");
                                 select(productMap, "ORIGINAL"); break categoryExit;
-                            case "C": new CartMenu(customer, cart, cartService).start();
-                            case "M":
-                                if (isLoggedIn)
-                                    new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
-                                new MainMenu(new CustomerService(new CustomerDAO())).start();
+                            case "C": new CartMenu(customer, cartService, isLoggedIn).start();
                                 break exit;
-                            case "X": break exit;
+                            case "M":
+                                if (!isLoggedIn){
+                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start();
+                                    break exit;
+                                }
+                                if (customer.getEmail() != null){
+                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(customer, true);
+                                    break exit;
+                                }
+                                new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(customer, false);
+                            case "X":
+                                if (customer.getEmail() == null && cart.getTotal() != 0){
+                                    if (!promptUserToSignUp())
+                                        isLoggedIn = false;
+                                }
+                                break exit;
                             default:
                                 System.out.println("\nInvalid entry. Try again"); break;
                         }
@@ -78,8 +91,27 @@ public class ProductMenu implements IMenu{
             }
         }
         if (!isLoggedIn){
+            if (cart.getTotal() != 0)
+                cartService.deleteCartJCT(cart.getId());
             cartService.deleteCartByCustomerID(customer.getId());
             customerService.deleteCustomer(customer.getId());
+        }
+    }
+
+    private boolean promptUserToSignUp(){
+        System.out.println("\nExiting the store now will delete your cart.");
+        System.out.println("You can save it by making a profile.");
+
+        System.out.println("\nSign Up? [Y]es/[N]o");
+        System.out.print("Enter: ");
+
+        while (true){
+            switch(input.nextLine().toUpperCase()){
+                case "Y": new SignUpMenu(customerService, new StoreService(new StoreDAO())).start(customer); return true;
+                case "N": return false;
+                default:
+                    System.out.println("\nInvalid Entry! Try Again...");
+            }
         }
     }
 
@@ -105,25 +137,34 @@ public class ProductMenu implements IMenu{
     // Purpose: To print to the user all products from a specific category
     private Map<String, Product> getProductListAndPrint(String category){
         Map<String, Product> productMap = productService.getProduct(category);
-        int index = 1, maxStrLengh = 30;
+        int index = 1, maxStrLength = 30;
 
         for (Product product : productMap.values()){
             // Output selection character and name
             System.out.print("\n[" + index + "] " + product.getName());
 
             // Get spacing distance
-            maxStrLengh -= product.getName().length() - String.valueOf(product.getPrice()).length();
+            maxStrLength -= product.getName().length() + String.valueOf(product.getPrice()).length() + 1;
 
             // Print until distance is reached
-            for (int i = 0; i <= maxStrLengh; i++)
+            for (int i = 0; i <= maxStrLength; i++)
                 System.out.print("-");
 
             // Print price
-            System.out.println(product.getPrice());
+            System.out.println("$" + product.getPrice());
+
+            System.out.print("\tIn Stock Quantity");
+
+            maxStrLength = 30 - "\t In Stock Quantity".length() - String.valueOf(product.getQuantity()).length();
+
+            for (int i = 0; i <= maxStrLength; i++)
+                System.out.print("-");
+
+            System.out.println(product.getQuantity());
 
             // Print description
             System.out.println(product.getDescription());
-            maxStrLengh = 30;
+            maxStrLength = 30;
             index++;
         }
 

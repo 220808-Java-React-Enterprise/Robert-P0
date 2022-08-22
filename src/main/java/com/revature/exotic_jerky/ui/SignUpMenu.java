@@ -37,7 +37,8 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
         exit:{
             if (customer == null) break exit;
             while (true){
-                System.out.println("\nEmail: " + customer.getEmail());
+                System.out.println("\nFirst Name: " + customer.getfName());
+                System.out.println("Email: " + customer.getEmail());
                 System.out.println("Please confirm account Sign up!");
                 System.out.println("[Y]es/[N]o/[U]pdate");
                 System.out.print("\nEnter: ");
@@ -54,29 +55,85 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
                                 customer.setZip(zip()); customer.setPhone(phone());
 
                                 if (!storeService.isDuplicateStore(customer.getAddress())){
-                                    Store store = new Store(UUID.randomUUID().toString(), "Exotic Jerky", customer.getAddress(),
+                                    Store store = new Store(UUID.randomUUID().toString(), "Exotic Jerky", customer.getEmail(), customer.getAddress(),
                                             customer.getCity(), customer.getState(), customer.getZip(), customer.getPhone());
 
                                     customerService.signUp(customer);
                                     storeService.saveStore(store);
-                                    new AdminMenu(new Customer(), new StoreService(new StoreDAO()), new CustomerService(new CustomerDAO())).start();
+                                    new AdminMenu(customer, store, new StoreService(new StoreDAO()), new CustomerService(new CustomerDAO())).start();
                                 } break exit;
                             }
                         customerService.signUp(customer);
-                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
+                        new MainMenu(new CustomerService(new CustomerDAO()), storeService).start(customer, true);
                         break exit;
                     case "N":
-                        new MainMenu(new CustomerService(new CustomerDAO())).start();
+                        new MainMenu(new CustomerService(new CustomerDAO()), storeService).start();
                         break exit;
                     case "U":
                         updateExit:{
                             System.out.println("\nWhat would you like to update!");
+                            System.out.println("[F]irst Name");
                             System.out.println("[E]mail");
                             System.out.println("[P]assword");
 
                             while (true){
                                 System.out.print("\nEnter: ");
                                 switch (input.nextLine().toUpperCase()){
+                                    case "F": customer.setfName(fName());
+                                        System.out.println("\nFirst name updated"); break updateExit;
+                                    case "E": customer.setEmail(email());
+                                        System.out.println("\nEmail updated"); break updateExit;
+                                    case "P": customer.setPassword(pass());
+                                        System.out.println("\nLast name updated"); break updateExit;
+                                    default:
+                                        System.out.println("\nInvalid entry! Try Again...");
+                                }
+                            }
+                        } break;
+                    default:
+                        System.out.println("\nInvalid entry! Try Again...");
+                        break;
+                }
+            }
+        }
+    }
+
+    // Pre:
+    // Post:
+    // Purpose:
+    public void start(Customer newCustomer){
+        System.out.println("\nSign Up!");
+
+        Customer customer = signUp();
+
+        customer.setId(newCustomer.getId());
+
+        exit:{
+            while (true){
+                System.out.println("\nFirst Name: " + customer.getfName());
+                System.out.println("Email: " + customer.getEmail());
+                System.out.println("Please confirm account Sign up!");
+                System.out.println("[Y]es/[N]o/[U]pdate");
+                System.out.print("\nEnter: ");
+
+                switch(input.nextLine().toUpperCase()){
+                    case "Y":
+                        customerService.updateAccount(customer);
+                        break exit;
+                    case "N":
+                        break exit;
+                    case "U":
+                        updateExit:{
+                            System.out.println("\nWhat would you like to update!");
+                            System.out.println("[F]irst Name");
+                            System.out.println("[E]mail");
+                            System.out.println("[P]assword");
+
+                            while (true){
+                                System.out.print("\nEnter: ");
+                                switch (input.nextLine().toUpperCase()){
+                                    case "F": customer.setfName(fName());
+                                        System.out.println("\nFirst name updated"); break updateExit;
                                     case "E": customer.setEmail(email());
                                         System.out.println("\nEmail updated"); break updateExit;
                                     case "P": customer.setPassword(pass());
@@ -100,17 +157,18 @@ public class SignUpMenu extends UpdateAccount implements IMenu{
     public Customer signUp(){
         String[] inputs = new String[10];
         exit:{
-            for (int i = 0; i <= 1; i++){
+            for (int i = 0; i <= 2; i++){
                 switch (i){
-                    case 0: inputs[0] = email(); break;
-                    case 1: inputs[1] = pass(); break;
+                    case 0: inputs[0] = fName(); break;
+                    case 1: inputs[1] = email(); break;
+                    case 2: inputs[2] = pass(); break;
                 }
                 if (inputs[i].equalsIgnoreCase("M")){
-                    new MainMenu(new CustomerService(new CustomerDAO())).start();
+                    new MainMenu(new CustomerService(new CustomerDAO()), storeService).start();
                     return null;
                 }
             }
         }
-        return new Customer(inputs[0], inputs[1]);
+        return new Customer(inputs[0], inputs[1], inputs[2]);
     }
 }

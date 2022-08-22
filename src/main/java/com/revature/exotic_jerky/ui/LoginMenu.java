@@ -11,14 +11,16 @@ import java.util.Scanner;
 
 public class LoginMenu implements IMenu{
     private final CustomerService customerService;
+    private final StoreService storeService;
 
     Scanner input = new Scanner(System.in);
 
     // Pre: None
     // Post: A instance of CustomerService is instantiated
     // Purpose: To instantiate an instance of CustomerService
-    public LoginMenu(CustomerService customer) {
+    public LoginMenu(CustomerService customer, StoreService storeService) {
         this.customerService = customer;
+        this.storeService = storeService;
     }
 
     // Pre: Login is selected from the MainMenu
@@ -35,14 +37,14 @@ public class LoginMenu implements IMenu{
                 email = input.nextLine();
 
                 if (email.equalsIgnoreCase("M")){
-                    new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
+                    new MainMenu(new CustomerService(new CustomerDAO()), storeService).start(); break exit;
                 }
 
                 System.out.print("\nPassword: ");
                 password = input.nextLine();
 
                 if (email.equalsIgnoreCase("M")){
-                    new MainMenu(new CustomerService(new CustomerDAO())).start(); break exit;
+                    new MainMenu(new CustomerService(new CustomerDAO()), storeService).start(); break exit;
                 }
 
                 if (!customerService.isDuplicateEmail(email)){
@@ -52,7 +54,7 @@ public class LoginMenu implements IMenu{
                         while(true){
                             switch (input.nextLine().toUpperCase()){
                                 case "Y": new SignUpMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(); break exitSignUp;
-                                case "N": new MainMenu(new CustomerService(new CustomerDAO())).start(); break exitSignUp;
+                                case "N": new MainMenu(new CustomerService(new CustomerDAO()), storeService).start(); break exitSignUp;
                                 default:
                                     System.out.println("\nInvalid Entry.");
                             }
@@ -62,9 +64,11 @@ public class LoginMenu implements IMenu{
 
                 try{
                     Customer customer = customerService.login(email, password);
-                    if (customer.getRole().equals("ADMIN")) new AdminMenu(customer, new StoreService(new StoreDAO()), new CustomerService(new CustomerDAO())).start();
+                    if (customer.getRole().equals("ADMIN")){
+                        new AdminMenu(customer, storeService.getByEmail(email), new StoreService(new StoreDAO()), new CustomerService(new CustomerDAO())).start();
+                    }
                     else
-                        new MainMenu(new CustomerService(new CustomerDAO())).start(customer, true);
+                        new MainMenu(new CustomerService(new CustomerDAO()), storeService).start(customer, true);
                     break exit;
                 } catch (InvalidCustomerException e){
                     System.out.println(e.getMessage());

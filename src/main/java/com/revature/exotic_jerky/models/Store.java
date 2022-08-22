@@ -1,11 +1,12 @@
 package com.revature.exotic_jerky.models;
 
 public class Store {
-    private String id, name, address, city, state, zip, phone;
+    private String id, name, email, address, city, state, zip, phone;
 
-    public Store(String id, String name, String address, String city, String state, String zip, String phone) {
+    public Store(String id, String name, String email, String address, String city, String state, String zip, String phone) {
         this.id = id;
         this.name = name;
+        this.email = email;
         this.address = address;
         this.city = city;
         this.state = state;
@@ -27,6 +28,14 @@ public class Store {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getAddress() {

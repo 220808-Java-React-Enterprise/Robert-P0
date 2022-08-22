@@ -15,12 +15,12 @@ public class StoreDAO implements CrudDAO<Store>{
     @Override
     public void save(Store store){
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
-            PreparedStatement ps = con.prepareStatement("INSERT INTO stores (id, name, address," +
-                    "city, state, zip, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO stores (id, name, email, address," +
+                    "city, state, zip, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             ps.setString(1, store.getId()); ps.setString(2, store.getName());
-            ps.setString(3, store.getAddress()); ps.setString(4, store.getCity());
-            ps.setString(5, store.getState()); ps.setString(6, store.getZip());
-            ps.setString(7, store.getPhone());
+            ps.setString(3, store.getEmail()); ps.setString(4, store.getAddress());
+            ps.setString(5, store.getCity()); ps.setString(6, store.getState());
+            ps.setString(7, store.getZip()); ps.setString(8, store.getPhone());
             ps.executeUpdate();
         } catch (SQLException e){
             throw new InvalidSQLException("Error trying to save store");
@@ -55,6 +55,20 @@ public class StoreDAO implements CrudDAO<Store>{
 
             if (rs.next()) return rs.getString("address");
 
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error getting user");
+        }
+        return null;
+    }
+
+    public Store getByEmail(String email){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM stores WHERE email = ?");
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) new Store(rs.getString("id"), rs.getString("name"), rs.getString("email"), rs.getString("address"), rs.getString("city"),
+                    rs.getString("state"), rs.getString("zip"), rs.getString("phone"));
         } catch (SQLException e){
             throw new InvalidSQLException("Error getting user");
         }

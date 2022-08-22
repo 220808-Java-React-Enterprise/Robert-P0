@@ -1,18 +1,18 @@
 package com.revature.exotic_jerky.models;
 
 public class Product {
-    private String id, category, name, description, store_id;
-    private int quantity;
+    private String id, category, name, description, storeID;
+    private byte quantity;
     private float price;
 
-    public Product(String id, String category, String name, String description, String store_id, int quantity, float price) {
+    public Product(String id, String category, String name, String description, String store_id, float price, byte quantity) {
         this.id = id;
         this.category = category;
         this.name = name;
         this.description = description;
-        this.store_id = store_id;
-        this.quantity = quantity;
+        this.storeID = store_id;
         this.price = price;
+        this.quantity = quantity;
     }
 
     public String getId() {
@@ -47,19 +47,19 @@ public class Product {
         this.description = description;
     }
 
-    public String getStore_id() {
-        return store_id;
+    public String getStoreID() {
+        return storeID;
     }
 
-    public void setStore_id(String store_id) {
-        this.store_id = store_id;
+    public void setStoreID(String storeID) {
+        this.storeID = storeID;
     }
 
-    public int getQuantity() {
+    public byte getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(byte quantity) {
         this.quantity = quantity;
     }
 

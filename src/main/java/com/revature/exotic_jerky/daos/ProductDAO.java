@@ -4,25 +4,39 @@ import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class ProductDAO implements CrudDAO<Product>{
     @Override
-    public void save(Product obj) throws IOException {
-
+    public void save(Product product){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("INSERT INTO products (id, category, name, price," +
+                    "description, quantity, store_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            ps.setString(1, product.getId()); ps.setString(2, product.getCategory());
+            ps.setString(3, product.getName()); ps.setFloat(4, product.getPrice());
+            ps.setString(5, product.getDescription()); ps.setShort(6, product.getQuantity());
+            ps.setString(7, product.getStoreID());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to update database");
+        }
     }
 
     @Override
-    public void update(Product obj) {
-
+    public void update(Product product) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("UPDATE products SET category = ?, name = ?, price = ?," +
+                    "description = ?, quantity = ? WHERE id = ?");
+            ps.setString(1, product.getCategory()); ps.setString(2, product.getName());
+            ps.setFloat(3, product.getPrice()); ps.setString(4, product.getDescription());
+            ps.setByte(5, product.getQuantity()); ps.setString(6, product.getId());
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to update database");
+        }
     }
 
     @Override
@@ -33,6 +47,20 @@ public class ProductDAO implements CrudDAO<Product>{
     @Override
     public void getById(String id) {
 
+    }
+
+    public Product getProductById(String id) {
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM products WHERE id = ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
+                    rs.getString("description"), rs.getString("store_id"), rs.getFloat("price"), rs.getByte("quantity"));
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error finding product");
+        }
+        return null;
     }
 
     @Override
@@ -49,7 +77,7 @@ public class ProductDAO implements CrudDAO<Product>{
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 products.put(rs.getString("name"), new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
-                        rs.getString("description"), rs.getString("store_id"), rs.getByte("quantity"), rs.getFloat("price")));
+                        rs.getString("description"), rs.getString("store_id"), rs.getFloat("price"), rs.getByte("quantity")));
             }
         } catch (SQLException e){
             throw new InvalidSQLException("Error getting product by category");

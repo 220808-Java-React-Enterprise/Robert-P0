@@ -4,14 +4,10 @@ import com.revature.exotic_jerky.models.Cart;
 import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
-import javafx.embed.swt.SWTFXUtils;
 
-import java.io.IOException;
 import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public class CartDAO implements CrudDAO<Cart>{
     @Override
@@ -113,6 +109,38 @@ public class CartDAO implements CrudDAO<Cart>{
             ps.executeUpdate();
         } catch (SQLException e){
             throw new InvalidSQLException("Error while updating existing cart");
+        }
+    }
+
+    public Map<String, List<String>> getCheckOutCart(String customerID){
+        Map<String, List<String>> cart = new TreeMap<>();
+        List<String> details;
+
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT products.name, products.price, carts_jct.quantity, " +
+                    "carts_jct.total FROM carts JOIN carts_jct ON carts.id = carts_jct.cart_id JOIN products ON " +
+                    "carts_jct.product_id = products.id WHERE carts.customer_id = ?");
+            ps.setString(1, customerID);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                details = new ArrayList<>();
+                details.add(rs.getString("name")); details.add(String.valueOf(rs.getFloat("price")));
+                details.add(String.valueOf(rs.getByte("quantity"))); details.add(String.valueOf(rs.getFloat("total")));
+                cart.put(rs.getString("name"), details);
+            }
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error trying to get customers cart");
+        }
+        return cart;
+    }
+
+    public void deleteCartJCTByCartID(String cartID){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("DELETE FROM carts_jct WHERE cart_id = ?");
+            ps.setString(1, cartID);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to delete from database");
         }
     }
 }
