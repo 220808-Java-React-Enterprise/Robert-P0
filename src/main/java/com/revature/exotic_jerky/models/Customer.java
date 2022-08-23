@@ -5,16 +5,43 @@ import java.util.UUID;
 public class Customer {
     private String id, fName, lName, email, password, address, city, state, zip, phone, role;
 
+    // Default Constructor
     public Customer(){
         this.id = UUID.randomUUID().toString();
         this.role = "DEFAULT";
     }
 
+    // Non-Default Constructor
+    public Customer(Customer customer) {
+        this.id = customer.getId();
+        this.email = customer.getEmail();
+        this.password = customer.getPassword();
+        this.fName = customer.getfName();
+        this.lName = customer.getlName();
+        this.address = customer.getAddress();
+        this.city = customer.getCity();
+        this.state = customer.getState();
+        this.zip = customer.getZip();
+        this.phone = customer.getPhone();
+        this. role = customer.getRole();
+    }
     public Customer(String fName, String email, String password){
         this.id = UUID.randomUUID().toString();
         this.fName = fName;
         this.email = email;
         this.password = password;
+        this.role = "DEFAULT";
+    }
+    public Customer(String id, String email, String fName, String lName, String address, String city, String state, String zip, String phone) {
+        this.id = id;
+        this.email = email;
+        this.fName = fName;
+        this.lName = lName;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.phone = phone;
         this.role = "DEFAULT";
     }
     public Customer(String id, String email, String password, String fName, String lName, String address, String city, String state, String zip, String phone) {
@@ -45,20 +72,6 @@ public class Customer {
         this.role = role;
     }
 
-    public Customer(Customer customer) {
-        this.id = customer.getId();
-        this.email = customer.getEmail();
-        this.password = customer.getPassword();
-        this.fName = customer.getfName();
-        this.lName = customer.getlName();
-        this.address = customer.getAddress();
-        this.city = customer.getCity();
-        this.state = customer.getState();
-        this.zip = customer.getZip();
-        this.phone = customer.getPhone();
-        this. role = customer.getRole();
-    }
-
     @Override
     public String toString() {
         return "Customer{" +
@@ -75,6 +88,7 @@ public class Customer {
                 '}';
     }
 
+    // Getter and Setters
     public String getId(){
         return id;
     }

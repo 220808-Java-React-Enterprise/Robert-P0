@@ -1,12 +1,9 @@
 package com.revature.exotic_jerky.ui;
 
-import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.models.Store;
 import com.revature.exotic_jerky.services.ProductService;
-import com.revature.exotic_jerky.services.StoreService;
 
 import java.util.Scanner;
-import java.util.Set;
 
 public class InventoryMenu implements IMenu{
     private final Store store;
@@ -14,11 +11,17 @@ public class InventoryMenu implements IMenu{
 
     private Scanner input = new Scanner(System.in);
 
+    // Pre: The admin has called to the Inventory Menu
+    // Post: The inventory menu is displayed to the admin
+    // Purpose: To allow the admin functionality of the inventory
     public InventoryMenu(Store store, ProductService productService) {
         this.store = store;
         this.productService = productService;
     }
 
+    // Pre: Admin called for the inventory Menu
+    // Post: The inventory menu is displayed to the admin
+    // Purpose: To give the admin the ability to update the store inventory
     @Override
     public void start() {
         System.out.println("\nInventory");
@@ -32,7 +35,7 @@ public class InventoryMenu implements IMenu{
                 System.out.print("\nEnter: ");
 
                 switch(input.nextLine().toUpperCase()){
-                    case "G":
+                    case "G": getInventory(); break exit;
                     case "U": readFile(); break exit;
                     case "B": break exit;
                     default:
@@ -42,6 +45,18 @@ public class InventoryMenu implements IMenu{
         }
     }
 
+    // Pre:
+    // Post:
+    // Purpose:
+    private void getInventory(){
+        String file = productService.readInventory();
+
+        System.out.println("\nInventory successfully extracted to " + file);
+    }
+
+    // Pre: A admin is logged in and looking to update the inventory
+    // Post: The inventory of the store is updated
+    // Purpose: To read the .xlsx file from the user and update the database inventory
     private void readFile(){
         String file;
 

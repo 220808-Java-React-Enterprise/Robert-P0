@@ -1,6 +1,7 @@
 package com.revature.exotic_jerky.daos;
 
 import com.revature.exotic_jerky.models.Customer;
+import com.revature.exotic_jerky.models.Product;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
 
@@ -58,12 +59,28 @@ public class CustomerDAO implements CrudDAO<Customer>{
     }
 
     @Override
-    public void getById(String id) {
+    public Product getById(String id) {
 
+        return null;
     }
 
     @Override
     public List getAll() {
+        return null;
+    }
+
+    public Customer getCustomerByEmail(String email){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT (id, fname, lname, email, address, city, state, zip, phone)" +
+                    "FROM customers WHERE email = ?");
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) return new Customer(rs.getString("id"), rs.getString("email"), rs.getString("fname"), rs.getString("lname"),
+                    rs.getString("address"), rs.getString("city"), rs.getString("state"), rs.getString("zip"), rs.getString("phone"));
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error getting user");
+        }
         return null;
     }
 

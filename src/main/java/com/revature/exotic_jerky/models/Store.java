@@ -3,6 +3,10 @@ package com.revature.exotic_jerky.models;
 public class Store {
     private String id, name, email, address, city, state, zip, phone;
 
+    // Default Constructor
+    public Store() {}
+
+    // Non-Default Constructor
     public Store(String id, String name, String email, String address, String city, String state, String zip, String phone) {
         this.id = id;
         this.name = name;
@@ -14,6 +18,7 @@ public class Store {
         this.phone = phone;
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }

@@ -1,8 +1,10 @@
 package com.revature.exotic_jerky.models;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.daos.OrderDAO;
 import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.services.CustomerService;
+import com.revature.exotic_jerky.services.OrderService;
 import com.revature.exotic_jerky.services.StoreService;
 import com.revature.exotic_jerky.ui.MainMenu;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
@@ -57,7 +59,7 @@ public class UpdateAccount {
                             System.out.println("\nAddress updated"); break updateExit;
                         case "H": updated.setPhone(phone());
                             System.out.println("\nPhone number updated"); break updateExit;
-                        case "M": new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(customer, true); break updateExit;
+                        case "M": new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO()), new OrderService(new OrderDAO())).start(customer, true); break updateExit;
                         case "B": return customer;
                         default: System.out.println("\nInvalid entry! Try Again...");
                     }

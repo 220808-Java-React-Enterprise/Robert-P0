@@ -4,6 +4,8 @@ import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.models.Store;
 import com.revature.exotic_jerky.utils.custom_exceptions.InvalidStoreException;
 
+import java.util.List;
+
 public class StoreService {
     private final StoreDAO storeDAO;
 
@@ -24,5 +26,9 @@ public class StoreService {
         if (store == null)
             throw new InvalidStoreException("Could not located store!");
         return store;
+    }
+
+    public List<Store> getAllStores(){
+        return storeDAO.getAll();
     }
 }

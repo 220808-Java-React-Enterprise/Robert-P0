@@ -1,23 +1,25 @@
 package com.revature.exotic_jerky.ui;
 
 import com.revature.exotic_jerky.daos.CustomerDAO;
+import com.revature.exotic_jerky.daos.OrderDAO;
 import com.revature.exotic_jerky.daos.StoreDAO;
 import com.revature.exotic_jerky.models.Cart;
 import com.revature.exotic_jerky.models.Customer;
 import com.revature.exotic_jerky.models.Product;
-import com.revature.exotic_jerky.services.CartService;
-import com.revature.exotic_jerky.services.CustomerService;
-import com.revature.exotic_jerky.services.ProductService;
-import com.revature.exotic_jerky.services.StoreService;
+import com.revature.exotic_jerky.models.Store;
+import com.revature.exotic_jerky.services.*;
+import com.revature.exotic_jerky.utils.custom_exceptions.InvalidCustomerException;
 
 import java.util.*;
 
 public class ProductMenu implements IMenu{
     private final Customer customer;
     private final Cart cart;
+    private final Store store;
     private final CustomerService customerService;
     private final ProductService productService;
     private final CartService cartService;
+    private final StoreService storeService;
 
     Scanner input = new Scanner(System.in);
     private boolean isLoggedIn;
@@ -25,12 +27,14 @@ public class ProductMenu implements IMenu{
     // Pre: None
     // Post: A new instance of ProductMenu is initialized
     // Purpose: To instantiate a new instance of ProductMenu
-    public ProductMenu(Customer customer, CustomerService customerService, ProductService productService, CartService cartService, boolean loggedIn) {
+    public ProductMenu(Customer customer, CustomerService customerService, ProductService productService, CartService cartService, StoreService storeService, boolean loggedIn) {
         this.customer = customer;
         this.customerService = customerService;
         this.productService = productService;
         this.cartService = cartService;
+        this.storeService = storeService;
         this.isLoggedIn = loggedIn;
+        this.store = getStoreToShopFrom();
         this.cart = isLoggedInGetCart(loggedIn);
     }
 
@@ -51,7 +55,7 @@ public class ProductMenu implements IMenu{
 
                 categoryExit:{
                     while (true){
-                        System.out.print("Enter: ");
+                        System.out.print("\nEnter: ");
                         String category = input.nextLine().toUpperCase();
 
                         if (category.equalsIgnoreCase("B")) break categoryExit;
@@ -65,18 +69,18 @@ public class ProductMenu implements IMenu{
                                 select(productMap, "SWEET"); break categoryExit;
                             case "O": productMap = getProductListAndPrint("ORIGINAL");
                                 select(productMap, "ORIGINAL"); break categoryExit;
-                            case "C": new CartMenu(customer, cartService, isLoggedIn).start();
-                                break exit;
+                            case "C": new CartMenu(customer, cartService, new OrderService(new OrderDAO()), new StoreService(new StoreDAO()), productService, store, isLoggedIn).start();
+                                break categoryExit;
                             case "M":
                                 if (!isLoggedIn){
-                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start();
+                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO()), new OrderService(new OrderDAO())).start();
                                     break exit;
                                 }
                                 if (customer.getEmail() != null){
-                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(customer, true);
+                                    new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO()), new OrderService(new OrderDAO())).start(customer, true);
                                     break exit;
                                 }
-                                new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO())).start(customer, false);
+                                new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO()), new OrderService(new OrderDAO())).start(customer, false);
                             case "X":
                                 if (customer.getEmail() == null && cart.getTotal() != 0){
                                     if (!promptUserToSignUp())
@@ -92,12 +96,55 @@ public class ProductMenu implements IMenu{
         }
         if (!isLoggedIn){
             if (cart.getTotal() != 0)
-                cartService.deleteCartJCT(cart.getId());
+                cartService.deleteCartJCT(cart.getID());
             cartService.deleteCartByCustomerID(customer.getId());
             customerService.deleteCustomer(customer.getId());
         }
     }
 
+    // Pre: A new ProductMenu is initialized
+    // Post: The store for the customer to shop at is set
+    // Purpose: To get the closest store to shop at
+    private Store getStoreToShopFrom(){
+        List<Store> stores = storeService.getAllStores();
+        Store storeToShop = stores.get(0);
+        int storeSelection = 99999;
+        String zip;
+
+        if (stores.size() > 1) {
+            if (customer.getZip() == null) {
+                exit:
+                {
+                    while (true) {
+                        System.out.println("\nPlease enter your zip code to shop store");
+                        System.out.println("\nFormat ##### or #####-####");
+                        System.out.print("Enter: ");
+                        zip = input.nextLine().toUpperCase();
+
+                        try {
+                            customerService.isValidZip(zip);
+                            break exit;
+                        } catch (InvalidCustomerException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+                customer.setZip(zip);
+            }
+            for (Store s : stores) {
+                if (Math.abs(Integer.parseInt(s.getZip()) - Integer.parseInt(customer.getZip())) < storeSelection) {
+                    storeToShop = s;
+                    storeSelection = Integer.parseInt(s.getZip());
+                }
+            }
+        }
+        System.out.println("\nYou are now shopping the " + storeToShop.getCity() + " store.");
+        return storeToShop;
+    }
+
+    // Pre: The user is trying to check out
+    // Post: The user now has created an account
+    // Purpose: To finish the sign-up of an account if they try to check out their cart
     private boolean promptUserToSignUp(){
         System.out.println("\nExiting the store now will delete your cart.");
         System.out.println("You can save it by making a profile.");
@@ -107,7 +154,7 @@ public class ProductMenu implements IMenu{
 
         while (true){
             switch(input.nextLine().toUpperCase()){
-                case "Y": new SignUpMenu(customerService, new StoreService(new StoreDAO())).start(customer); return true;
+                case "Y": new SignUpMenu(customerService, new StoreService(new StoreDAO())).start(customer, false); return true;
                 case "N": return false;
                 default:
                     System.out.println("\nInvalid Entry! Try Again...");
@@ -115,21 +162,18 @@ public class ProductMenu implements IMenu{
         }
     }
 
-    // Pre: Pre
-    // Post:
-    // Purpose:
+    // Pre: A customer is logged in
+    // Post: A cart is returned if there is one on their account else return a new cart
+    // Purpose: To check if the user has an existing cart
     private Cart isLoggedInGetCart(boolean isLoggedIn){
         if (isLoggedIn) {
             System.out.println("\nWelcome " + customer.getfName() + "!");
-            return cartService.hasExistingCart(customer.getId());
         }
         else{
             System.out.println("Welcome to our Product!");
             customerService.signUp(customer);
-            Cart newCart = new Cart(UUID.randomUUID().toString(), 0.00f, new Date(), customer.getId() );
-            cartService.saveCart(newCart);
-            return newCart;
         }
+        return cartService.hasExistingCart(customer.getId());
     }
 
     // Pre: ProductMenu must be started
@@ -172,8 +216,8 @@ public class ProductMenu implements IMenu{
     }
 
     // Pre: A list of products is displayed to the user
-    // Post:
-    // Purpose:
+    // Post: A user has selected a product from the list
+    // Purpose: To allow the user to select a product
     private void select(Map<String, Product> productMap, String category){
         exit:{
             while (true){
@@ -202,9 +246,9 @@ public class ProductMenu implements IMenu{
         }
     }
 
-    // Pre:
-    // Post:
-    // Purpose:
+    // Pre: A user has selected a product
+    // Post: Product is added to the users cart
+    // Purpose: To add a product to the users cart
     private String addToCart(Product[] products, int index, String category){
         exitConfirmation:{
             while (true){
@@ -228,6 +272,10 @@ public class ProductMenu implements IMenu{
                                 if (quantity < products[index - 1].getQuantity()){
                                     float total = quantity * products[index - 1].getPrice();
                                     cart.setTotal(cart.getTotal() + total);
+
+                                    if (!cartService.isExistingCart(customer.getId()))
+                                        cartService.saveCart(cart, store.getId());
+
                                     cartService.updateCartTotal(cart);
                                     cartService.addToCart(cart, quantity, total, products[index - 1]);
                                     isLoggedIn = true;

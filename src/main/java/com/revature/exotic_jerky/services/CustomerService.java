@@ -35,13 +35,16 @@ public class CustomerService {
     public void updateAccount(Customer customer){
         customerDAO.update(customer);
     }
+
+    public Customer getByEmail(String email){
+        return customerDAO.getCustomerByEmail(email);
+    }
     
     // Pre:
     // Post:
     // Purpose:
     public boolean isDuplicateEmail(String email){
-        if (customerDAO.getByEmail(email) != null) return true;
-        else return false;
+        return customerDAO.getByEmail(email) != null;
     }
 
     // Pre:

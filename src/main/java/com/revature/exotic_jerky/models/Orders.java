@@ -4,6 +4,7 @@ public class Orders {
     private String id, created, customer_id, store_id;
     private float total;
 
+    // Non-Default Constructor
     public Orders(String id, String created, String customer_id, String store_id, float total) {
         this.id = id;
         this.created = created;
@@ -12,6 +13,7 @@ public class Orders {
         this.total = total;
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }

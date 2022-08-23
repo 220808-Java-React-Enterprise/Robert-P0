@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -23,12 +24,22 @@ public class ProductService {
         this.productDAO = productDAO;
     }
 
+    public Product getProductByID(String productID){
+        return productDAO.getById(productID);
+    }
+
     public Map<String, Product> getProduct(String category){
         return productDAO.getAllByCategory(category);
     }
 
     public void update(Product product){
         productDAO.update(product);
+    }
+
+    public void updateProductQuantity(byte quantity, String productID){
+        byte currProductQty = productDAO.getById(productID).getQuantity();
+        currProductQty -= quantity;
+        productDAO.updateProductQuantity(currProductQty, productID);
     }
 
     public boolean writeInventory(String file, String storeID){
@@ -82,7 +93,7 @@ public class ProductService {
         // Loop to update Inventory
         for (Product product : productSet){
             Product oldProduct;
-            if ((oldProduct = productDAO.getProductById(product.getId())) != null){
+            if ((oldProduct = productDAO.getById(product.getId())) != null){
                 oldProduct.setCategory(product.getCategory());
                 oldProduct.setName(product.getName());
                 oldProduct.setDescription(product.getDescription());
@@ -97,7 +108,47 @@ public class ProductService {
         return true;
     }
 
-    public static void readInventory(){
+    public String readInventory(){
+        String file = "exoticjerky_inventory.xlsx";
+        String path = "S:\\WorkFiles\\Git\\Revature\\Robert-P0\\src\\main\\resources\\" + file;
+        XSSFWorkbook wb = new XSSFWorkbook();
 
+        XSSFSheet sheet = wb.createSheet();
+
+        Map<String, List<Product>> productMap = productDAO.getAllProductSortedByCategory();
+
+        int rowNumber = 0;
+        Row row = sheet.createRow(rowNumber++);
+        Cell cell;
+
+        cell = row.createCell(0); cell.setCellValue("Category");
+        cell = row.createCell(1); cell.setCellValue("Name");
+        cell = row.createCell(2); cell.setCellValue("Description");
+        cell = row.createCell(3); cell.setCellValue("Price");
+        cell = row.createCell(4); cell.setCellValue("Quantity");
+        cell = row.createCell(5); cell.setCellValue("Product ID");
+
+        for (List<Product> ls : productMap.values()){
+            for (Product p : ls){
+                row = sheet.createRow(rowNumber++);
+                cell = row.createCell(0); cell.setCellValue(p.getCategory());
+                cell = row.createCell(1); cell.setCellValue(p.getName());
+                cell = row.createCell(2); cell.setCellValue(p.getDescription());
+                cell = row.createCell(3); cell.setCellValue(p.getPrice());
+                cell = row.createCell(4); cell.setCellValue(p.getQuantity());
+                cell = row.createCell(5); cell.setCellValue(p.getId());
+            }
+        }
+
+        try{
+            FileOutputStream fos = new FileOutputStream(path);
+
+            wb.write(fos);
+
+            fos.close();
+        } catch (IOException e){
+            throw new InvalidFileException("Error trying to write file");
+        }
+        return file;
     }
 }

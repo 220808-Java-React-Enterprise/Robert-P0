@@ -7,9 +7,7 @@ public class Cart {
     private Date date;
     private float total;
 
-    // Pre:
-    // Post:
-    // Purpose:
+    // Non-Default Constructor
     public Cart(String id, float total, Date date, String customerID) {
         this.id = id;
         this.total = total;
@@ -17,7 +15,8 @@ public class Cart {
         this.customerID = customerID;
     }
 
-    public String getId() {
+    // Getter and Setters
+    public String getID() {
         return id;
     }
 

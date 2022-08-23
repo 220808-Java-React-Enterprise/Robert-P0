@@ -5,6 +5,7 @@ import com.revature.exotic_jerky.utils.custom_exceptions.InvalidSQLException;
 import com.revature.exotic_jerky.utils.database.ConnectionFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,32 +40,63 @@ public class ProductDAO implements CrudDAO<Product>{
         }
     }
 
+    public void updateProductQuantity(byte quantity, String productID){
+        try (Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("UPDATE products SET quantity = ? WHERE id = ?");
+            ps.setFloat(1, quantity); ps.setString(2, productID);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error trying to update quantity");
+        }
+    }
+
     @Override
     public void delete(String id) {
 
     }
 
     @Override
-    public void getById(String id) {
-
-    }
-
-    public Product getProductById(String id) {
-        try (Connection con = ConnectionFactory.getInstance().getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM products WHERE id = ?");
-            ps.setString(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) return new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
-                    rs.getString("description"), rs.getString("store_id"), rs.getFloat("price"), rs.getByte("quantity"));
-        } catch (SQLException e){
-            throw new InvalidSQLException("Error finding product");
-        }
+    public List<Product> getAll() {
         return null;
     }
 
+    public Map<String, List<Product>> getAllProductSortedByCategory(){
+        Map<String, List<Product>> products = new TreeMap<>();
+        List<Product> p;
+        String cat;
+
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM products");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                cat = rs.getString("category");
+                if (!products.containsKey(cat))
+                    products.put(rs.getString("category"), new ArrayList<>());
+
+                p = products.get(cat);
+                p.add(new Product(rs.getString("id"), rs.getString("category"), rs.getString("name"),
+                        rs.getString("description"), rs.getString("store_id"), rs.getFloat("price"), rs.getByte("quantity")));
+                products.put(cat, p);
+            }
+
+            return products;
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error trying to grab stores");
+        }
+    }
+
     @Override
-    public List<Product> getAll() {
+    public Product getById(String id) {
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM products WHERE id = ?");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return new Product(rs.getString("id"), rs.getString("category"),
+                    rs.getString("name"), rs.getString("description"),
+                    rs.getString("store_id"), rs.getFloat("price"), rs.getByte("quantity"));
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error getting product");
+        }
         return null;
     }
 

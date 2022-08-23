@@ -12,13 +12,14 @@ import java.util.UUID;
 public class CartService {
     private final CartDAO cartDAO;
 
-    // Pre:
-    // Post:
-    // Purpose:
+    // Non-Default Constructor
     public CartService(CartDAO cartDAO) {
         this.cartDAO = cartDAO;
     }
 
+    // Pre:
+    // Post:
+    // Purpose:
     public Cart hasExistingCart(String customerID){
         Cart cart = cartDAO.getCartByCustomerID(customerID);
         if (cart == null){
@@ -27,12 +28,23 @@ public class CartService {
         return cart;
     }
 
-    public void saveCart(Cart cart){
-        cartDAO.save(cart);
+    // Pre:
+    // Post:
+    // Purpose:
+    public boolean isExistingCart(String customerID){
+        return cartDAO.getCartByCustomerID(customerID) != null;
+    }
+
+    public void saveCart(Cart cart, String storeID){
+        cartDAO.save(cart, storeID);
     }
 
     public void updateCartTotal(Cart cart){
         cartDAO.updateTotal(cart);
+    }
+
+    public void updateCartID(String customerID, String cartID){
+        cartDAO.updateCustomerID(customerID, cartID);
     }
 
     public void addToCart(Cart cart, byte quantity, float total, Product product){

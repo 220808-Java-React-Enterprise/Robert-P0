@@ -5,6 +5,7 @@ public class Product {
     private byte quantity;
     private float price;
 
+    // Non-Default Constructor
     public Product(String id, String category, String name, String description, String store_id, float price, byte quantity) {
         this.id = id;
         this.category = category;
@@ -15,6 +16,7 @@ public class Product {
         this.quantity = quantity;
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }
