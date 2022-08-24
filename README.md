@@ -11,7 +11,7 @@
 
 ### Brief
 
-I was tasked with developing an API that will help customers shop product of my store through an online environment.
+I was tasked with developing a console mock website that will help customers shop product through an online environment.
 This system will manage customer account information for any transactions with any products sold through the store. 
 Each store has a number of customers dependent on store to customer location. These customers are allowed to shop the
 store without an account. However, to purchase any product from the store an account must exist. Furthermore, 
@@ -24,6 +24,7 @@ attached store. Combined with customer search of all customers.
 - Maven
 - PostgresSQL
 - Docker
+- Dbeaver
 - Junit
 - Mockito
 - Apache POI
@@ -35,7 +36,7 @@ attached store. Combined with customer search of all customers.
 - Customer
 
 
-## ER Diagram
+## ERD
 ![ERD](https://user-images.githubusercontent.com/6863697/186303650-45ebb28d-b86e-498a-aa74-05da165b5657.png)
 
 ## Contributors

@@ -269,7 +269,7 @@ public class ProductMenu implements IMenu{
                             try{
                                 byte quantity = (byte)Integer.parseInt(str);
                                 // Insert into cart
-                                if (quantity < products[index - 1].getQuantity()){
+                                if (quantity <= products[index - 1].getQuantity()){
                                     float total = quantity * products[index - 1].getPrice();
                                     cart.setTotal(cart.getTotal() + total);
 
@@ -286,6 +286,7 @@ public class ProductMenu implements IMenu{
                                     getProductListAndPrint(category);
                                     break exitConfirmation;
                                 }
+                                System.out.println("\nQuantity requested is to high.");
                             } catch (NumberFormatException e){
                                 System.out.println("\nInvalid Input. Must be a numeric value.");
                             }
