@@ -36,7 +36,7 @@ attached store. Combined with customer search of all customers.
 
 
 ## ER Diagram
-<img src="S:\WorkFiles\Git\Revature\Robert-P0\ERD.png">
+![ERD](https://user-images.githubusercontent.com/6863697/186303650-45ebb28d-b86e-498a-aa74-05da165b5657.png)
 
 ## Contributors
 -Robert James
