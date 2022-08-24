@@ -15,6 +15,5 @@ import com.revature.exotic_jerky.ui.MainMenu;
 public class Main {
     public static void main(String[] args){
         new MainMenu(new CustomerService(new CustomerDAO()), new StoreService(new StoreDAO()), new OrderService(new OrderDAO())).start();
-        System.out.println("\nThanks for Visiting! Hope to see you again soon!");
     }
 }

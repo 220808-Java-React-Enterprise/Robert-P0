@@ -49,7 +49,7 @@ public class ProductMenu implements IMenu{
                 System.out.println("[S]picy");
                 System.out.println("S[w]eet");
                 System.out.println("[O]riginal");
-                System.out.println("[C]art");
+                System.out.println("\n[C]art");
                 System.out.println("[M]ain Menu");
                 System.out.println("E[x]it Store");
 
@@ -154,7 +154,7 @@ public class ProductMenu implements IMenu{
 
         while (true){
             switch(input.nextLine().toUpperCase()){
-                case "Y": new SignUpMenu(customerService, new StoreService(new StoreDAO())).start(customer, false); return true;
+                case "Y": new SignUpMenu(customerService, new StoreService(new StoreDAO())).start(); return true;
                 case "N": return false;
                 default:
                     System.out.println("\nInvalid Entry! Try Again...");
@@ -181,7 +181,7 @@ public class ProductMenu implements IMenu{
     // Purpose: To print to the user all products from a specific category
     private Map<String, Product> getProductListAndPrint(String category){
         Map<String, Product> productMap = productService.getProduct(category);
-        int index = 1, maxStrLength = 30;
+        int index = 1, maxStrLength = 40;
 
         for (Product product : productMap.values()){
             // Output selection character and name
@@ -199,7 +199,7 @@ public class ProductMenu implements IMenu{
 
             System.out.print("\tIn Stock Quantity");
 
-            maxStrLength = 30 - "\t In Stock Quantity".length() - String.valueOf(product.getQuantity()).length();
+            maxStrLength = 40 - "\t In Stock Quantity".length() - String.valueOf(product.getQuantity()).length();
 
             for (int i = 0; i <= maxStrLength; i++)
                 System.out.print("-");
@@ -208,7 +208,7 @@ public class ProductMenu implements IMenu{
 
             // Print description
             System.out.println(product.getDescription());
-            maxStrLength = 30;
+            maxStrLength = 40;
             index++;
         }
 
@@ -277,9 +277,12 @@ public class ProductMenu implements IMenu{
                                         cartService.saveCart(cart, store.getId());
 
                                     cartService.updateCartTotal(cart);
-                                    cartService.addToCart(cart, quantity, total, products[index - 1]);
+                                    cart.setTotal(total);
+                                    cartService.addToCart(cart, quantity, products[index - 1].getId());
                                     isLoggedIn = true;
                                     System.out.println("\nAdded to cart!");
+                                    System.out.print("Enter to continue...");
+                                    input.nextLine();
                                     getProductListAndPrint(category);
                                     break exitConfirmation;
                                 }

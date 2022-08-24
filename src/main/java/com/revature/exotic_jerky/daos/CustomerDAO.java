@@ -71,7 +71,7 @@ public class CustomerDAO implements CrudDAO<Customer>{
 
     public Customer getCustomerByEmail(String email){
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT (id, fname, lname, email, address, city, state, zip, phone)" +
+            PreparedStatement ps = con.prepareStatement("SELECT id, fname, lname, email, address, city, state, zip, phone " +
                     "FROM customers WHERE email = ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();

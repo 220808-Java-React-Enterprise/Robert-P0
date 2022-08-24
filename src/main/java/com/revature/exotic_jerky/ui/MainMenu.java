@@ -83,6 +83,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                             System.out.println("[U]pdate Account");
                         }
                         else{
+                            System.out.println("[P]roduct");
                             System.out.println("[L]ogin");
                             System.out.println("[S]ign Up");
                         }
@@ -99,7 +100,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
 
                             case "O": Map<String, List<String>> map = getOrderList(customer);
                                 printOrderHistory(map);
-                                expandOrder(customer, map); break menuExit;
+                                expandOrder(map); break menuExit;
 
                             case "C": new CartMenu(customer, new CartService(new CartDAO()), orderService, storeService, new ProductService(new ProductDAO()), new Store(), loggedIn).start(); break;
 
@@ -180,7 +181,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                 }
             }
 
-            return orderService.getOrderHistory(customer.getRole(), customer.getId(), sortType, ascending);
+            return orderService.getOrderHistory(customer.getId(), sortType, ascending, customer.getRole());
 
         }
         return null;
@@ -190,7 +191,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
     // Post: The users order history is displayed to the user
     // Purpose: To get the user order history and print it to the user
     private void printOrderHistory(Map<String, List<String>> orders){
-        int index = 1, maxStrLength = 30;
+        int index = 1, maxStrLength;
 
         if (orders != null){
             for (List<String> details : orders.values()) {
@@ -228,7 +229,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
     // Pre: The order history of a user is displayed to the screen
     // Post: A specific order in the customers orders is expanded
     // Purpose: To show all details of a customers order
-    private void expandOrder(Customer customer, Map<String, List<String>> map){
+    private void expandOrder(Map<String, List<String>> map){
         exit:{
             while (true){
                 System.out.print("\nSelect to expand order. Or [B]ack");
@@ -243,7 +244,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
                     int counter = 1;
                     for (List<String> order : map.values()){
                         if (counter == index){
-                            printFullOrder(customer, order);
+                            printFullOrder(order);
                             printOrderHistory(map);
                             break;
                         }
@@ -263,8 +264,8 @@ public class MainMenu extends UpdateAccount implements IMenu{
     // Pre: A customers has requested to expand an order in their history
     // Post: The expanded form of an order is printed
     // Purpose: To print the full order of an order in the customers history
-    private void printFullOrder(Customer customer, List<String> order){
-        Map<String, List<String>> fullOrder = orderService.getOrderHistory(customer.getId(), order.get(5));
+    private void printFullOrder(List<String> order){
+        Map<String, List<String>> fullOrder = orderService.getOrderHistory(order.get(5));
         float grandTotal = 0;
 
         System.out.println("\nOrder ID: " + order.get(5));
@@ -280,7 +281,7 @@ public class MainMenu extends UpdateAccount implements IMenu{
 
             System.out.println(product.get(1));
             System.out.print("Total");
-            maxSpace = 30 - "Total".length() - product.get(2).length();
+            maxSpace = 34 - "Total".length() - product.get(2).length();
 
             for (int i = 0; i < maxSpace; i++)
                 System.out.print("-");

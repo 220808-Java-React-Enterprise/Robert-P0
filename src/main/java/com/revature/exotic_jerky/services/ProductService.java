@@ -80,7 +80,7 @@ public class ProductService {
                         input[inCount] = UUID.randomUUID().toString();
                     }
                     if (!keyValues)
-                        productSet.add(new Product(String.valueOf(input[6]), String.valueOf(input[0]), String.valueOf(input[1]),
+                        productSet.add(new Product(String.valueOf(input[5]), String.valueOf(input[0]), String.valueOf(input[1]),
                             String.valueOf(input[2]), storeID, Float.parseFloat(String.valueOf(input[3])), (byte)Float.parseFloat(String.valueOf(input[4]))));
                     keyValues = false;
                 }
@@ -108,9 +108,8 @@ public class ProductService {
         return true;
     }
 
-    public String readInventory(){
-        String file = "exoticjerky_inventory.xlsx";
-        String path = "S:\\WorkFiles\\Git\\Revature\\Robert-P0\\src\\main\\resources\\" + file;
+    public void readInventory(String file){
+        String path = "S:\\WorkFiles\\Git\\Revature\\Robert-P0\\src\\main\\resources\\" + file + ".xlsx";
         XSSFWorkbook wb = new XSSFWorkbook();
 
         XSSFSheet sheet = wb.createSheet();
@@ -149,6 +148,5 @@ public class ProductService {
         } catch (IOException e){
             throw new InvalidFileException("Error trying to write file");
         }
-        return file;
     }
 }

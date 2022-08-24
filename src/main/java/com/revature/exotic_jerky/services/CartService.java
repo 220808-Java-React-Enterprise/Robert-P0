@@ -43,20 +43,24 @@ public class CartService {
         cartDAO.updateTotal(cart);
     }
 
+    public void updateCartQuantityAndTotal(Cart cart, String productID, byte quantity){
+        addToCart(cart, quantity, productID);
+    }
+
     public void updateCartID(String customerID, String cartID){
         cartDAO.updateCustomerID(customerID, cartID);
     }
 
-    public void addToCart(Cart cart, byte quantity, float total, Product product){
-        String[] list = cartDAO.hasExistingItem(cart, product);
+    public void addToCart(Cart cart, byte quantity, String productID){
+        String[] list = cartDAO.hasExistingItem(cart, productID);
 
         if (list != null){
             byte newQuantity = (byte) (quantity + Byte.parseByte(list[1]));
-            float newTotal = total + Float.parseFloat(list[2]);
-            cartDAO.updateExistingItem(list[0], cart, newQuantity, newTotal);
+            cart.setTotal(cart.getTotal() + Float.parseFloat(list[2]));
+            cartDAO.updateExistingItem(list[0], cart, newQuantity);
         }
         else
-            cartDAO.addToCart(cart, quantity, total, product);
+            cartDAO.addToCart(cart, quantity, productID);
     }
 
     public void deleteCartByCustomerID(String customerID){
@@ -65,6 +69,10 @@ public class CartService {
 
     public void deleteCartJCT(String cartID){
         cartDAO.deleteCartJCTByCartID(cartID);
+    }
+
+    public void deleteCartJCT(String cartID, String productID){
+        cartDAO.deleteCartJCTByCartIDAndProductID(cartID, productID);
     }
 
     public Map<String, List<String>> getCheckOutCart(String customerID){

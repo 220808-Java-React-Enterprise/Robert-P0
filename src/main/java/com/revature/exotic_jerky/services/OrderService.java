@@ -3,7 +3,6 @@ package com.revature.exotic_jerky.services;
 import com.revature.exotic_jerky.daos.OrderDAO;
 import com.revature.exotic_jerky.models.Orders;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,11 +34,12 @@ public class OrderService {
     // Pre:
     // Post:
     // Purpose:
-    public Map<String, List<String>> getOrderHistory(String role, String customerID, String sortType, boolean ascending) {
-        return orderDAO.getOrderHistory(customerID, sortType, ascending);
+    public Map<String, List<String>> getOrderHistory(String ID, String sortType, boolean ascending, String role) {
+        if (role.equals("ADMIN")) return orderDAO.getStoreHistory(ID, sortType, ascending);
+        return orderDAO.getOrderHistory(ID, sortType, ascending);
     }
 
-    public Map<String, List<String>> getOrderHistory(String customerID, String orderID){
-        return orderDAO.getOrderHistory(customerID, orderID);
+    public Map<String, List<String>> getOrderHistory(String orderID){
+        return orderDAO.getOrderHistory(orderID);
     }
 }

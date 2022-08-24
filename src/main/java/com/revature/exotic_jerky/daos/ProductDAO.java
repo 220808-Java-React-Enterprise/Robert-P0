@@ -90,6 +90,7 @@ public class ProductDAO implements CrudDAO<Product>{
     public Product getById(String id) {
         try(Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("SELECT * FROM products WHERE id = ?");
+            ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return new Product(rs.getString("id"), rs.getString("category"),
                     rs.getString("name"), rs.getString("description"),

@@ -66,12 +66,12 @@ public class CartDAO implements CrudDAO<Cart>{
         return null;
     }
 
-    public void addToCart(Cart cart, byte quantity, float total, Product product){
+    public void addToCart(Cart cart, byte quantity, String productID){
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("INSERT INTO carts_jct (id, quantity, total, cart_id, product_id) VALUES (?, ?, ?, ?, ?)");
             ps.setString(1, UUID.randomUUID().toString()); ps.setByte(2, quantity);
-            ps.setFloat(3, total); ps.setString(4, cart.getID());
-            ps.setString(5, product.getId());
+            ps.setFloat(3, cart.getTotal()); ps.setString(4, cart.getID());
+            ps.setString(5, productID);
             ps.executeUpdate();
         } catch (SQLException e){
             throw new InvalidSQLException("Error trying to save to cart");
@@ -98,10 +98,10 @@ public class CartDAO implements CrudDAO<Cart>{
         }
     }
 
-    public String[] hasExistingItem(Cart cart, Product product){
+    public String[] hasExistingItem(Cart cart, String productID){
         try(Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("SELECT id, quantity, total FROM carts_jct WHERE cart_id = ? AND product_id = ?");
-            ps.setString(1, cart.getID()); ps.setString(2, product.getId());
+            ps.setString(1, cart.getID()); ps.setString(2, productID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()){
                 String[] list = new String[3];
@@ -116,10 +116,10 @@ public class CartDAO implements CrudDAO<Cart>{
         return null;
     }
 
-    public void updateExistingItem(String id, Cart cart, byte quantity, float total){
+    public void updateExistingItem(String id, Cart cart, byte quantity){
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("UPDATE carts_jct SET quantity = ?, total = ? WHERE id = ?");
-            ps.setByte(1, quantity); ps.setFloat(2, total);
+            ps.setByte(1, quantity); ps.setFloat(2, cart.getTotal());
             ps.setString(3, id);
             ps.executeUpdate();
         } catch (SQLException e){
@@ -157,6 +157,16 @@ public class CartDAO implements CrudDAO<Cart>{
             ps.executeUpdate();
         } catch (SQLException e){
             throw new InvalidSQLException("Error tyring to delete from database");
+        }
+    }
+
+    public void deleteCartJCTByCartIDAndProductID(String cartID, String productID){
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("DELETE FROM carts_jct WHERE cart_id = ? AND product_id = ?");
+            ps.setString(1, cartID); ps.setString(2, productID);
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new InvalidSQLException("Error deleting product from cart");
         }
     }
 }

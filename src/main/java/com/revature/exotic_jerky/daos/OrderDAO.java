@@ -88,15 +88,15 @@ public class OrderDAO implements CrudDAO<Orders>{
         return cart;
     }
 
-    public Map<String, List<String>> getOrderHistory(String customerID, String orderID){
+    public Map<String, List<String>> getOrderHistory(String orderID){
         Map<String, List<String>> cart = new TreeMap<>();
         List<String> details;
 
         try (Connection con = ConnectionFactory.getInstance().getConnection()){
             PreparedStatement ps = con.prepareStatement("SELECT products.name, orders_jct.quantity, orders_jct.total, orders.grand_total " +
                     "FROM orders JOIN orders_jct ON orders.id = orders_jct.order_id JOIN products ON orders_jct.product_id = products.id " +
-                    "WHERE orders.customer_id = ? AND orders.id = ?");
-            ps.setString(1, customerID); ps.setString(2, orderID);
+                    "WHERE orders.id = ?");
+            ps.setString(1, orderID);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 details = new ArrayList<>();
@@ -108,5 +108,34 @@ public class OrderDAO implements CrudDAO<Orders>{
             throw new InvalidSQLException("Error trying to get customers cart");
         }
         return cart;
+    }
+
+    public Map<String, List<String>> getStoreHistory(String storeID, String sortType, boolean ascending){
+        Map<String, List<String>> history = new TreeMap<>();
+
+        if (ascending) history = new TreeMap<>();
+        else history = new TreeMap<>(Collections.reverseOrder());
+
+        List<String> details;
+
+        try(Connection con = ConnectionFactory.getInstance().getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT products.name, orders_jct.quantity, orders_jct.total, orders.created, orders.grand_total, " +
+                    "orders.id FROM orders JOIN orders_jct ON orders.id = orders_jct.order_id JOIN products ON orders_jct.product_id = products.id " +
+                    "WHERE orders.store_id = ?");
+            ps.setString(1, storeID);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                details = new ArrayList<>();
+                details.add(rs.getString("name")); details.add(String.valueOf(rs.getByte("quantity")));
+                details.add(String.valueOf(rs.getFloat("total"))); details.add(rs.getString("created"));
+                details.add(String.valueOf(rs.getFloat("grand_total"))); details.add(rs.getString("id"));
+
+                history.put(rs.getString(sortType), details);
+            }
+        }
+        catch (SQLException e){
+            throw new InvalidSQLException("Error tyring to get store order history");
+        }
+        return history;
     }
 }

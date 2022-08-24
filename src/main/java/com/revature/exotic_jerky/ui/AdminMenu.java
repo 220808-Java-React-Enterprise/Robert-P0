@@ -8,6 +8,7 @@ import com.revature.exotic_jerky.services.OrderService;
 import com.revature.exotic_jerky.services.ProductService;
 import com.revature.exotic_jerky.services.StoreService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -55,23 +56,28 @@ public class AdminMenu implements IMenu{
                         switch(input.nextLine().toUpperCase()){
                             case "I": new InventoryMenu(store, new ProductService(new ProductDAO())).start(); break exit;
                             case "H":
-                                orders = storeOrderHistory(store);
-                                if (orders == null) { System.out.println("No orders found"); break exitAdmin; }
-
-                                printOrderHistory(orders);
+                                orders = getOrderList(customer, true);
+                                if (orders.size() != 0){
+                                    printOrderHistory(orders);
+                                    Map.Entry<String, List<String>> entry = orders.entrySet().iterator().next();
+                                    expandOrder(orders);
+                                }
+                                else
+                                    System.out.println("\nNo orders located");
+                                break exit;
                             case "S":
                                 customerSearched = searchCustomer();
                                 if (customerSearched == null) { System.out.println("\n No customer found"); break exitAdmin; }
 
-                                orders = getOrderList(customerSearched);
+                                orders = getOrderList(customerSearched, false);
                                 if (orders == null){ System.out.println("No orders found"); break exitAdmin; }
 
                                 printOrderHistory(orders);
-                                expandOrder(customerSearched, orders);
+                                expandOrder(orders);
                                 break exit;
 
                             case "M": new MainMenu(customerService, storeService, orderService).start(customer, true); break exitAdmin;
-                            case "X": break exitAdmin;
+                            case "X": System.out.println("\nThanks for Visiting! Hope to see you again soon!"); System.exit(0);
                             default:
                                 System.out.println("\nInvalid Entry! Try Again...");
                         }
@@ -79,14 +85,6 @@ public class AdminMenu implements IMenu{
                 }
             }
         }
-    }
-
-    // Pre:
-    // Post:
-    // Purpose:
-    private Map<String, List<String>> storeOrderHistory(Store store){
-        //needs implementation
-        return null;
     }
 
     // Pre:
@@ -112,7 +110,7 @@ public class AdminMenu implements IMenu{
     // Pre: User requests their order history
     // Post: A list of the users order history is returned
     // Purpose: To get the order history of a customer
-    private Map<String, List<String>> getOrderList(Customer customer){
+    private Map<String, List<String>> getOrderList(Customer customer, boolean admin){
         String sortType, temp;
         boolean ascending;
         exitSearch:{
@@ -160,7 +158,15 @@ public class AdminMenu implements IMenu{
                 }
             }
 
-            return orderService.getOrderHistory(customer.getRole(), customer.getId(), sortType, ascending);
+            String id = customer.getId();
+            String role = customer.getRole();
+
+            if (admin){
+                id = store.getId();
+                role = this.customer.getRole();
+            }
+
+            return orderService.getOrderHistory(id, sortType, ascending, role);
 
         }
         return null;
@@ -170,7 +176,7 @@ public class AdminMenu implements IMenu{
     // Post: The users order history is displayed to the user
     // Purpose: To get the user order history and print it to the user
     private void printOrderHistory(Map<String, List<String>> orders){
-        int index = 1, maxStrLength = 30;
+        int index = 1, maxStrLength;
 
         if (orders != null){
             for (List<String> details : orders.values()) {
@@ -201,14 +207,14 @@ public class AdminMenu implements IMenu{
             }
         }
         else{
-            System.out.println("\nNo order history for customer. :(");
+            System.out.println("\nNo order history. :(");
         }
     }
 
     // Pre: The order history of a user is displayed to the screen
     // Post: A specific order in the customers orders is expanded
     // Purpose: To show all details of a customers order
-    private void expandOrder(Customer customer, Map<String, List<String>> map){
+    private void expandOrder(Map<String, List<String>> map){
         exit:{
             while (true){
                 System.out.print("\nSelect to expand order. Or [B]ack");
@@ -223,7 +229,7 @@ public class AdminMenu implements IMenu{
                     int counter = 1;
                     for (List<String> order : map.values()){
                         if (counter == index){
-                            printFullOrder(customer, order);
+                            printFullOrder(order);
                             printOrderHistory(map);
                             break;
                         }
@@ -243,8 +249,8 @@ public class AdminMenu implements IMenu{
     // Pre: A customers has requested to expand an order in their history
     // Post: The expanded form of an order is printed
     // Purpose: To print the full order of an order in the customers history
-    private void printFullOrder(Customer customer, List<String> order){
-        Map<String, List<String>> fullOrder = orderService.getOrderHistory(customer.getId(), order.get(5));
+    private void printFullOrder(List<String> order){
+        Map<String, List<String>> fullOrder = orderService.getOrderHistory(order.get(5));
         float grandTotal = 0;
 
         System.out.println("\nOrder ID: " + order.get(5));
@@ -253,7 +259,7 @@ public class AdminMenu implements IMenu{
             System.out.println("\n" + product.get(0));
             System.out.print("Quantity");
 
-            int maxSpace = 30 - "Quantity".length() - product.get(1).length();
+            int maxSpace = 34 - "Quantity".length() - product.get(1).length();
 
             for (int i = 0; i < maxSpace; i++)
                 System.out.print("-");
@@ -265,7 +271,7 @@ public class AdminMenu implements IMenu{
             for (int i = 0; i < maxSpace; i++)
                 System.out.print("-");
 
-            System.out.println(product.get(2));
+            System.out.printf("%.2f%n", Float.parseFloat(product.get(2)));
             grandTotal = Float.parseFloat(product.get(3));
         }
 

@@ -49,9 +49,14 @@ public class InventoryMenu implements IMenu{
     // Post:
     // Purpose:
     private void getInventory(){
-        String file = productService.readInventory();
+        String file;
 
-        System.out.println("\nInventory successfully extracted to " + file);
+        System.out.println("\nFile must be in .xlsx(exclude .xlsx)");
+        System.out.print("Enter file name: ");
+        file = input.nextLine();
+
+        productService.readInventory(file);
+        System.out.println("\nInventory successfully saved to " + file);
     }
 
     // Pre: A admin is logged in and looking to update the inventory

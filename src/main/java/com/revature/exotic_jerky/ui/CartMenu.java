@@ -71,7 +71,7 @@ public class CartMenu implements IMenu{
                         System.out.print("\nEnter: ");
 
                         switch(input.nextLine().toUpperCase()){
-                            case "U": updateCart(summary); break exitChoice;
+                            case "U": summary = updateCart(summary); break exitChoice;
                             case "C": checkOut(summary); break exit;
                             case "B": break exit;
                             default:
@@ -89,18 +89,16 @@ public class CartMenu implements IMenu{
     // Post: The users cart is displayed to the user
     // Purpose: To get the users cart from the database
     private Map<String, List<String>> getCart(String customerID) {
-        Map<String, List<String>> map = cartService.getCheckOutCart(cart.getCustomerID());
-        int index = 1, maxStrLength = 30;
-        float grandTotal = 0.00f;
+        // Get map and check if quantity or price needs to be updated
+        Map<String, List<String>> map = cartQuantityAndPriceCheck(cartService.getCheckOutCart(cart.getCustomerID()));
+        float grandTotal;
 
-        for (List<String> details : map.values()) {
-            grandTotal = printProduct(details, grandTotal);
-        }
+        grandTotal = printProduct(map);
 
         if (map.size() != 0){
             System.out.print("\n\tGrand Total");
 
-            maxStrLength -= "\tGrand Total".length() + String.valueOf(grandTotal).length() - 6;
+            int maxStrLength = 30 - "\tGrand Total".length() - String.valueOf(grandTotal).length() + 6;
 
             for (int i = 0; i < maxStrLength; i++)
                 System.out.print("-");
@@ -108,6 +106,33 @@ public class CartMenu implements IMenu{
             System.out.println("$" + String.format("%.2f", grandTotal));
         }
 
+        return map;
+    }
+
+    // Pre:
+    // Post:
+    // Purpose:
+    private Map<String, List<String>> cartQuantityAndPriceCheck(Map<String, List<String>> map){
+        // Verify that the quantity for each product is still available
+        for (List<String> p : map.values()){
+            Product product = productService.getProductByID(p.get(4));
+
+            // Check if product quantity is less than available stock
+            if (Byte.parseByte(String.valueOf(p.get(2))) > product.getQuantity()){
+                System.out.println("\nMax stock quantity for " + product.getName() + " is less then your cart quantity." +
+                        "Reducing quantity to " + product.getQuantity() + ".");
+                p.set(2, String.valueOf(product.getQuantity()));
+                p.set(3, String.valueOf(Float.parseFloat(p.get(1)) * Byte.parseByte(p.get(2))));
+            }
+
+            // Check if product price has changed
+            if (Float.parseFloat(String.valueOf(p.get(1))) != product.getPrice()){
+                System.out.println("\nPrice for " + product.getName() + " has changed." +
+                        "Updating price to " + product.getPrice() + ".");
+                p.set(1, String.valueOf(product.getPrice()));
+                p.set(3, String.valueOf(Float.parseFloat(p.get(1)) * Byte.parseByte(p.get(2))));
+            }
+        }
         return map;
     }
 
@@ -157,10 +182,6 @@ public class CartMenu implements IMenu{
                 System.out.print("Enter: ");
                 switch(input.nextLine().toUpperCase()){
                     case "Y":
-                        for (List<String> p : summary.values()){
-                            Product product = productService.getProductByID(p.get(4));
-                        }
-
                         // Save Order and Delete Cart
                         String orderID = UUID.randomUUID().toString();
                         orderService.saveOrder(new Orders(orderID, String.valueOf(new Date()), customer.getId(), store.getId(), cart.getTotal()), store.getId());
@@ -186,15 +207,17 @@ public class CartMenu implements IMenu{
     // Pre: To allow the user to update their cart
     // Post: The user has updated their cart
     // Purpose: To allow the user to update their cart
-    private void updateCart(Map<String, List<String>> summary){
-        System.out.println("Select the product you would like to update");
+    private Map<String, List<String>> updateCart(Map<String, List<String>> summary){
         exit:{
             while (true){
-                System.out.println("\nEnter [B]ack");
+                printProduct(summary);
+                System.out.println("\nSelect the product you would like to update");
+                System.out.println("Enter [B]ack");
                 System.out.print("Make a selection: ");
                 String selection = input.nextLine();
                 if (selection.equalsIgnoreCase("B")) break exit;
 
+                // Verify input
                 try{
                     int index = Integer.parseInt(selection);
 
@@ -207,11 +230,10 @@ public class CartMenu implements IMenu{
                     List<String> product = null;
                     for (List<String> products : summary.values()){
                         if (i == index) { product = products; break; }
+                        i++;
                     }
 
                     if (product != null){
-                        printProduct(product, 0);
-
                         System.out.println("\nWhat would you like to do?");
                         System.out.println("\n[U]pdate quantity");
                         System.out.println("[D]elete from cart");
@@ -223,8 +245,18 @@ public class CartMenu implements IMenu{
                                 System.out.print("\nEnter: ");
 
                                 switch (input.nextLine().toUpperCase()){
-                                    case "U": updateQuantity(product.get(4));
-                                    case "D": deleteFromCart(product.get(4)); break exitUpdate;
+                                    case "U":
+                                        byte newQty = updateQuantity(product.get(4));
+                                        cart.setTotal(Float.parseFloat(product.get(1)) * newQty - Float.parseFloat(product.get(3)));
+                                        cartService.updateCartQuantityAndTotal(cart, product.get(4), (byte) (newQty - Byte.parseByte(product.get(2))));
+                                        product.set(2, String.valueOf(newQty));
+                                        product.set(3, String.valueOf(Float.parseFloat(product.get(1)) * Byte.parseByte(product.get(2))));
+                                        break exitUpdate;
+
+                                    case "D": deleteFromCart(product.get(4));
+                                        summary.remove(product.get(0));
+
+                                        break exitUpdate;
                                     case "B": break exitUpdate;
                                     default:
                                         System.out.println("\nInvalid Entry! Try Again...");
@@ -240,55 +272,80 @@ public class CartMenu implements IMenu{
                 }
             }
         }
+        return summary;
     }
 
     // Pre: The user has called to update cart
     // Post: A product is removed from the users cart
     // Purpose: To remove a product from the users cart
     private void deleteFromCart(String productID){
-        //needs implementation
+        cartService.deleteCartJCT(cart.getID(), productID);
     }
 
     // Pre: The user wants to update their cart
     // Post: The quantity of a product in a users cart is updated
     // Purpose: To update the quantity of a product in a users cart
-    private void updateQuantity(String productID){
+    private byte updateQuantity(String productID){
+        // Get current quantity
+        Product product = productService.getProductByID(productID);
+        exit:{
+            while(true){
+                System.out.print("\nNew quantity: ");
 
+                try{
+                    byte newQuantity = Byte.parseByte(input.nextLine());
+
+                    if (newQuantity > product.getQuantity())
+                        System.out.println("\nIn stock is only " + product.getQuantity());
+                    else
+                        return newQuantity;
+                } catch (NumberFormatException e){
+                    System.out.println("\nInvalid Input. Must be a numeric value.");
+                }
+            }
+        }
     }
 
     // Pre: A list of the carts products is passed in
     // Post: The product is printed to the user
     // Purpose: To print the product to the user
-    private float printProduct(List<String> product, float grandTotal){
-        int index = 1, maxStrLength = 30;
-        // Output selection character and name
-        System.out.print("\n[" + index + "] " + product.get(0));
+    private float printProduct(Map<String, List<String>> map){
+        int index = 1;
+        float grandTotal = 0;
 
-        maxStrLength -= product.get(0).length() + product.get(1).length() + 1;
+        for (List<String> product : map.values()) {
+            int  maxStrLength = 30;
+            // Output selection character and name
+            System.out.print("\n[" + index + "] " + product.get(0));
 
-        for (int i = 0; i < maxStrLength; i++)
-            System.out.print("-");
+            maxStrLength -= product.get(0).length() + product.get(1).length() + 1;
 
-        System.out.println("$" + product.get(1));
+            for (int i = 0; i < maxStrLength; i++)
+                System.out.print("-");
 
-        System.out.print("\tQuantity");
+            System.out.println("$" + product.get(1));
 
-        maxStrLength = 30 - "\tQuantity".length() - product.get(2).length() - 2;
+            System.out.print("\tQuantity");
 
-        for (int i = 0; i < maxStrLength; i++)
-            System.out.print("-");
+            maxStrLength = 30 - "\tQuantity".length() - product.get(2).length() - 2;
 
-        System.out.println(product.get(2));
+            for (int i = 0; i < maxStrLength; i++)
+                System.out.print("-");
 
-        System.out.print("\tTotal");
+            System.out.println(product.get(2));
 
-        maxStrLength = 30 - "\tTotal".length() - product.get(3).length() + 1;
+            System.out.print("\tTotal");
 
-        for (int i = 0; i < maxStrLength; i++)
-            System.out.print("-");
+            maxStrLength = 30 - "\tTotal".length() - product.get(3).length() + 1;
 
-        System.out.println("$" + String.format("%.2f", Float.parseFloat(product.get(3))));
+            for (int i = 0; i < maxStrLength; i++)
+                System.out.print("-");
 
-        return grandTotal + Float.parseFloat(product.get(3));
+            System.out.println("$" + String.format("%.2f", Float.parseFloat(product.get(3))));
+
+            grandTotal += Float.parseFloat(product.get(3));
+            index++;
+        }
+        return grandTotal;
     }
 }
